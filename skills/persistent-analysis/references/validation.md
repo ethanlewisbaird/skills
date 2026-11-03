@@ -6,7 +6,13 @@ Synthetic fixtures only. No scientific datasets, loaded user workspaces or pre-e
 
 The runtime was tested on Linux Slurm compute nodes with Python 3.12.2 and R 4.4.3. Seurat and SeuratObject were already installed in the tested environment. User environment/alias files were inspected but not changed. The bridge defaults to a private shared home-directory registry. The shared development checkout reports broadly writable permissions on this host, so the personal runtime is installed as a private home-directory copy rather than a symlink to that checkout.
 
-## Executed tests
+## Current revision: terminal launchers only
+
+At the user's request, the sbatch launcher and its submission/job-ID branches were removed. The Slurm entry script is now `slurm/start-worker.sh`, used only through srun under tmux or screen. The README retains a future-option note; the previous implementation remains in Git history.
+
+Post-change validation: both real terminal launchers passed in 18.290 seconds. Five focused compute-node tests passed in 12.281 seconds: private-root/traversal safeguards, login-node worker refusal, rejection of the removed launcher before any registry/job setup, R initialization/persistence, and Python persistence across independent CLI calls. Official skill validation and shell syntax checks passed. The previously completed full suite below is historical; the expanded 25-test suite was not rerun in full for this launcher-only change. Installed runtime and repository source were updated together after confirming no active registered sessions.
+
+## Historical baseline tests (before removing the batch launcher)
 
 | Check | Observation |
 | --- | --- |
@@ -31,7 +37,7 @@ Installed-copy checks also confirmed matching runtime hashes, user ownership/pri
 ## Failures found and corrected
 
 1. Initial 20-check run: a result reader could lose a path when the queue directory moved to the claimed-task directory. Added an order-aware lookup and one retry for that single atomic move. The expanded final 24-test suite passed.
-2. Initial launcher run: tmux and screen passed, but sbatch's copied script resolved its installation relative to Slurm's spool directory. The original skill directory is now passed explicitly as the script's third argument; all three launchers subsequently passed.
+2. Initial launcher run: tmux and screen passed, but sbatch's copied script resolved its installation relative to Slurm's spool directory. At that revision, passing the original skill directory as a third argument fixed the issue and all three launchers passed. This batch-specific code has since been removed.
 3. First agent forward attempt: its sandbox could read the registry but could not write queue requests. It stopped truthfully without analysis or an invented result. The retry explicitly granted that synthetic registry via Codex `--add-dir`; the same worker then completed the task. Skill/README now explain that even object inspection requires registry write access. No sandbox bypass was used.
 4. Security inspection: the source checkout's mount reports world-writable directories/files. The production installation uses a user-owned private copy under Codex home. Queue permissions remain independently enforced.
 

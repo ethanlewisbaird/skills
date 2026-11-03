@@ -1,6 +1,6 @@
 ---
 name: persistent-analysis
-description: Reuse loaded R/Seurat or Python objects in a persistent Slurm interpreter across tasks and conversations. Discover private filesystem-queue sessions, attach existing R/radian or Python/IPython interpreters, and explicitly launch new workers under tmux, screen or sbatch when authorized. Use for consecutive analyses and plots on in-memory objects; not for unrelated terminal administration.
+description: Reuse loaded R/Seurat or Python objects in a persistent Slurm interpreter across tasks and conversations. Discover private filesystem-queue sessions, attach existing R/radian or Python/IPython interpreters, and explicitly launch new workers under tmux or screen when authorized. Use for consecutive analyses and plots on in-memory objects; not for unrelated terminal administration.
 license: MIT
 ---
 
@@ -28,7 +28,7 @@ Scripts execute sequentially in the chosen interpreter and project working direc
 
 ## New sessions and boundaries
 
-If no suitable worker is available, report the actual state. Ask for the project, language/environment, object initialization and resource budget needed for an explicit `start`. Never silently allocate, reconnect a stale generation, reload data, or replay a claimed task. `start` supports tmux, screen and sbatch with explicit memory units, walltime, CPU count and optional environment script. A new session loads its authorized init script once. The launcher uses Slurm and shared files; no direct compute-node SSH or incoming connection is required. Do not alter/cancel pre-existing jobs.
+If no suitable worker is available, report the actual state. Ask for the project, language/environment, object initialization and resource budget needed for an explicit `start`. Never silently allocate, reconnect a stale generation, reload data, or replay a claimed task. `start` supports tmux and screen with explicit memory units, walltime, CPU count and optional environment script. A new session loads its authorized init script once. The launcher uses Slurm and shared files; no direct compute-node SSH or incoming connection is required. Do not alter/cancel pre-existing jobs.
 
 Use a separate authorized Slurm job for heavy independent/parallel work that should not block the interactive interpreter or exceeds its allocation; document any deliberate data reloading required for that independent process. Scientific validity and understanding remain distinct from session execution: e.g. donor-aware treatment inference is still necessary even if a Seurat object is already loaded.
 

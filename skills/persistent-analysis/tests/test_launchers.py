@@ -22,9 +22,9 @@ class LauncherTests(unittest.TestCase):
             root = Path(work) / 'sessions'
             env = {key: value for key, value in os.environ.items() if not key.startswith('SLURM_')}
             prefix = [sys.executable, str(CLI), '--root', str(root)]
-            for launcher in ('tmux', 'screen', 'sbatch'):
+            for launcher in ('tmux', 'screen'):
                 with self.subTest(launcher=launcher):
-                    if launcher != 'sbatch' and not shutil.which(launcher):
+                    if not shutil.which(launcher):
                         self.skipTest(launcher + ' unavailable')
                     name = 'test-' + launcher
                     selected = prefix + ['--session', name]
@@ -36,8 +36,6 @@ class LauncherTests(unittest.TestCase):
                     session = root / name
                     recorded = json.loads((session / 'launch.json').read_text())
                     self.assertEqual(recorded['launcher'], launcher)
-                    if launcher == 'sbatch':
-                        self.assertTrue(recorded['submitted_job_id'].isdigit())
                     try:
                         deadline = time.monotonic() + 60
                         while time.monotonic() < deadline:

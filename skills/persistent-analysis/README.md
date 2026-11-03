@@ -4,7 +4,7 @@ Keep large R/Seurat or Python objects in one compute-node interpreter across age
 
 The skill supports both:
 - **Existing manual session:** start tmux/screen → your normal Slurm allocation → activate your environment → radian/R or IPython/Python → run the printed bootstrap once. Your existing variables stay in the same interpreter.
-- **New dedicated worker:** an explicit launcher creates a Slurm allocation under tmux, screen or sbatch and runs a persistent interpreter, optionally initializing selected objects once.
+- **New dedicated worker:** an explicit launcher creates a Slurm allocation under tmux or screen and runs a persistent interpreter, optionally initializing selected objects once.
 
 The bootstrap temporarily occupies a manual REPL. Stop the bridge gracefully to return to that same REPL and its objects. The bridge does not provide simultaneous manual typing and agent execution; sharing mutation without coordination would be unsafe. It never sends keystrokes into arbitrary panes. New dedicated workers are queue-owned interpreters, not interactive radian/IPython prompts.
 
@@ -63,7 +63,7 @@ persistent-analysis --session scrna-r start --language r \
   --env-script /shared/project/activate-r.sh --init /shared/project/init.R
 ```
 
-Use `--launcher screen` or `--launcher sbatch` as preferred. Python uses `--language python` and an optional Python initializer. `--env-script` is a trusted shell file sourced on the compute node before selecting `python`/`Rscript`, for example:
+Use `--launcher screen` if preferred. Python uses `--language python` and an optional Python initializer. `--env-script` is a trusted shell file sourced on the compute node before selecting `python`/`Rscript`, for example:
 
 ```bash
 source /path/to/conda/etc/profile.d/conda.sh
@@ -82,17 +82,11 @@ tmux -L persistent-analysis attach -t pa-scrna-r
 screen -r pa-scrna-r
 ```
 
-Startup diagnostics go to the session's `startup.log`. A pending allocation has no active interpreter yet; inspect `squeue --me` and the startup log. The configurable [slurm/start-worker.sbatch](slurm/start-worker.sbatch) also accepts direct submission:
+Startup diagnostics go to the session's `startup.log`. A pending allocation has no active interpreter yet; inspect `squeue --me` and the startup log. The launcher uses `srun` through [slurm/start-worker.sh](slurm/start-worker.sh), with no direct compute-node SSH.
 
-```bash
-sbatch --ntasks=1 --cpus-per-task=4 --mem=32G --time=24:00:00 \
-  --partition=YOUR_PARTITION --no-requeue \
-  --output=/shared/private/session/startup.log \
-  /path/to/skill/slurm/start-worker.sbatch \
-  /shared/private/session /shared/project/activate-r.sh /path/to/skill
-```
+## Future option: batch workers
 
-Prepare that session first. The third script argument is essential: sbatch copies scripts into a spool directory, so their runtime location is not the original installation. No direct SSH is used. User-controlled Slurm defaults should not silently enable job requeue: an automatic new interpreter cannot preserve previous RAM, and the generation claim will refuse it.
+The `sbatch` launcher has been deliberately removed for now. It could be restored later for unattended workers that do not need tmux/screen, using the same persistent interpreter and queue. Reintroducing it should include durable submission/job-ID tracking, explicit environment/resources, no automatic restart/replay, and dedicated lifecycle tests. The earlier implementation is preserved in Git history (commit `809b862`). This is a future option, not a supported startup method.
 
 ## Execute and retrieve
 
@@ -147,6 +141,6 @@ srun --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:08:00 \
   python tests/test_bridge.py
 ```
 
-From the login node, `python tests/test_launchers.py` explicitly launches three short, separate test allocations (tmux, screen, sbatch) and gracefully stops only its own workers. The test partition defaults to `fast`; set `PERSISTENT_TEST_PARTITION` for your cluster. These launcher tests incur real Slurm allocations. They do not reuse or cancel pre-existing jobs. The full suite's Seurat test requires Seurat already installed; it does not install packages.
+From the login node, `python tests/test_launchers.py` explicitly launches two short, separate test allocations (tmux and screen) and gracefully stops only its own workers. The test partition defaults to `fast`; set `PERSISTENT_TEST_PARTITION` for your cluster. These launcher tests incur real Slurm allocations. They do not reuse or cancel pre-existing jobs. The full suite's Seurat test requires Seurat already installed; it does not install packages.
 
 Results and remaining limitations are in [references/validation.md](references/validation.md). Implementation facts were checked against [R evaluation documentation](https://stat.ethz.ch/R-manual/R-devel/library/base/html/source.html), [Python execution documentation](https://docs.python.org/3/library/functions.html#exec), and [Slurm srun documentation](https://slurm.schedmd.com/srun.html). Licensed under the [MIT license](LICENSE).

@@ -129,9 +129,7 @@ def status(session):
     private(session)
     launch_info = read(session / 'launch.json') if (session / 'launch.json').exists() else {}
     info = {**read(session / 'session.json'), **launch_info, **read(session / 'worker.json')}
-    if info['state'] == 'prepared' and info.get('submitted_job_id'):
-        info['job_id'] = info['submitted_job_id']
-    if info['state'] in {'initializing', 'ready'} or (info['state'] == 'prepared' and info.get('job_id')):
+    if info['state'] in {'initializing', 'ready'}:
         # Check scheduler even with a recent heartbeat: the entire allocation can end abruptly.
         try:
             result = subprocess.run(['squeue', '-h', '-j', str(info['job_id']), '-o', '%T'],
@@ -140,8 +138,6 @@ def status(session):
                 info['state'] = 'allocation-ended'
             elif result.returncode == 0:
                 info['slurm_state'] = result.stdout.strip()
-                if info['state'] == 'prepared':
-                    info['state'] = 'allocation-pending' if 'PENDING' in result.stdout else 'starting'
             elif 'invalid job id' in result.stderr.lower():
                 info['state'] = 'allocation-ended'
             else:
@@ -391,23 +387,16 @@ def launch(args, session):
                '--time=' + args.time, '--job-name=pa-' + args.session]
     if args.partition:
         command.append('--partition=' + args.partition)
-    script = str(BASE / 'slurm/start-worker.sbatch')
-    arguments = [script, str(session), str(Path(args.env_script).resolve(strict=True)) if args.env_script else '', str(BASE)]
-    if args.launcher == 'sbatch':
-        output = subprocess.check_output(['sbatch', '--parsable', '--no-requeue', '--output=' + str(session / 'startup.log'),
-                                          *command, *arguments], text=True).strip()
-        record = {'launcher': 'sbatch', 'submitted_job_id': output.split(';')[0]}
-        atomic(session / 'launch.json', record)
-        print(json.dumps({'session': str(session), **record}))
-    else:
-        # The multiplexer lives on the login node; only srun's interpreter lives on the compute node.
-        shell = shlex.join(['srun', *command, *arguments]) + ' > ' + shlex.quote(str(session / 'startup.log')) + ' 2>&1'
-        title = 'pa-' + args.session
-        mux = ['tmux', '-L', 'persistent-analysis', '-f', '/dev/null', 'new-session', '-d', '-s', title, shell] if args.launcher == 'tmux' else ['screen', '-dmS', title, 'bash', '-c', shell]
-        subprocess.run(mux, check=True)
-        record = {'launcher': args.launcher, 'terminal_session': title}
-        atomic(session / 'launch.json', record)
-        print(json.dumps({'session': str(session), **record}))
+    script = str(BASE / 'slurm/start-worker.sh')
+    arguments = [script, str(session), str(Path(args.env_script).resolve(strict=True)) if args.env_script else '']
+    # The multiplexer lives on the login node; only srun's interpreter lives on the compute node.
+    shell = shlex.join(['srun', *command, *arguments]) + ' > ' + shlex.quote(str(session / 'startup.log')) + ' 2>&1'
+    title = 'pa-' + args.session
+    mux = ['tmux', '-L', 'persistent-analysis', '-f', '/dev/null', 'new-session', '-d', '-s', title, shell] if args.launcher == 'tmux' else ['screen', '-dmS', title, 'bash', '-c', shell]
+    subprocess.run(mux, check=True)
+    record = {'launcher': args.launcher, 'terminal_session': title}
+    atomic(session / 'launch.json', record)
+    print(json.dumps({'session': str(session), **record}))
 
 
 def main():
@@ -446,7 +435,7 @@ def main():
         p.add_argument('--project', type=Path, default=Path.cwd())
         p.add_argument('--init', type=Path)
         if name == 'start':
-            p.add_argument('--launcher', choices=('tmux', 'screen', 'sbatch'), required=True)
+            p.add_argument('--launcher', choices=('tmux', 'screen'), required=True)
             p.add_argument('--mem', required=True)
             p.add_argument('--time', required=True)
             p.add_argument('--cpus', type=int, default=1)

@@ -242,6 +242,16 @@ class ProtocolTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 pa.prepare(Path(work) / 'safe', '../escape', 'python', work)
 
+    def test_removed_batch_launcher_is_rejected_before_setup(self):
+        with tempfile.TemporaryDirectory() as work:
+            root = Path(work) / 'sessions'
+            outcome = subprocess.run([sys.executable, str(CORE), '--root', str(root),
+                                      '--session', 'test', 'start', '--language', 'python',
+                                      '--launcher', 'sbatch', '--mem', '1G', '--time', '00:01:00'],
+                                     capture_output=True, text=True)
+            self.assertEqual(outcome.returncode, 2)
+            self.assertFalse(root.exists())
+
     def test_no_worker_outside_slurm(self):
         with tempfile.TemporaryDirectory() as work:
             session = pa.prepare(Path(work) / 'sessions', 'test', 'python', work)
