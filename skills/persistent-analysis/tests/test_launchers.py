@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -36,6 +37,9 @@ class LauncherTests(unittest.TestCase):
                     session = root / name
                     recorded = json.loads((session / 'launch.json').read_text())
                     self.assertEqual(recorded['launcher'], launcher)
+                    expected_monitor = ['tmux', '-L', 'persistent-analysis', 'attach', '-t', 'pa-' + name] if launcher == 'tmux' else ['screen', '-r', 'pa-' + name]
+                    self.assertEqual(shlex.split(recorded['monitor_command']), expected_monitor)
+                    self.assertEqual(json.loads(launched.stdout)['monitor_command'], recorded['monitor_command'])
                     try:
                         deadline = time.monotonic() + 60
                         while time.monotonic() < deadline:

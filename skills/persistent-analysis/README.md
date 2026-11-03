@@ -8,6 +8,14 @@ The skill supports both:
 
 The bootstrap temporarily occupies a manual REPL. Stop the bridge gracefully to return to that same REPL and its objects. The bridge does not provide simultaneous manual typing and agent execution; sharing mutation without coordination would be unsafe. It never sends keystrokes into arbitrary panes. New dedicated workers are queue-owned interpreters, not interactive radian/IPython prompts.
 
+## Simplest use: ask the agent
+
+For an already registered session, just ask for the analysis: “Use my loaded R object to make this plot.” The agent discovers the matching project/session and handles execution and results.
+
+For a new session, say for example: “Start a persistent R session for this project using my chosen conda environment, tmux, 4 CPUs, 32G RAM and 24 hours.” Supply the actual environment and any required partition; the agent asks only for missing details, launches the worker, waits/checks readiness, and returns a monitor command. It can write an initializer and load objects when you authorize the actual paths. You do not need to run the commands below yourself; they also document what the agent does. Previously supplied authorization/preferences need not be repeated, but missing environment/resource choices must not be guessed.
+
+The one exception is an interpreter you already opened and loaded manually: its memory cannot be reached by launching another interpreter. The agent prepares a bootstrap for that existing prompt. You paste it once, or explicitly identify and authorize a verified idle tmux/screen target for the agent to enter it. A targetless automatic takeover is not supported. Until then it must not pretend to be using your loaded objects.
+
 ## Installation
 
 Requirements: Linux with `/proc`, Python 3.8+, Slurm and a shared filesystem. R 4.x is needed only for R workers; Seurat and analysis packages must already exist in the chosen R environment. tmux/screen are needed only for their respective launchers. Workers refuse to start without `SLURM_JOB_ID`.
@@ -82,7 +90,7 @@ tmux -L persistent-analysis attach -t pa-scrna-r
 screen -r pa-scrna-r
 ```
 
-Startup diagnostics go to the session's `startup.log`. A pending allocation has no active interpreter yet; inspect `squeue --me` and the startup log. The launcher uses `srun` through [slurm/start-worker.sh](slurm/start-worker.sh), with no direct compute-node SSH.
+Startup/status JSON includes `monitor_command`, ready to copy if you want to watch the worker. Startup diagnostics go to the session's `startup.log`. A pending allocation has no active interpreter yet; inspect `squeue --me` and the startup log. The launcher uses `srun` through [slurm/start-worker.sh](slurm/start-worker.sh), with no direct compute-node SSH.
 
 ## Future option: batch workers
 
@@ -144,3 +152,5 @@ srun --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:08:00 \
 From the login node, `python tests/test_launchers.py` explicitly launches two short, separate test allocations (tmux and screen) and gracefully stops only its own workers. The test partition defaults to `fast`; set `PERSISTENT_TEST_PARTITION` for your cluster. These launcher tests incur real Slurm allocations. They do not reuse or cancel pre-existing jobs. The full suite's Seurat test requires Seurat already installed; it does not install packages.
 
 Results and remaining limitations are in [references/validation.md](references/validation.md). Implementation facts were checked against [R evaluation documentation](https://stat.ethz.ch/R-manual/R-devel/library/base/html/source.html), [Python execution documentation](https://docs.python.org/3/library/functions.html#exec), and [Slurm srun documentation](https://slurm.schedmd.com/srun.html). Licensed under the [MIT license](LICENSE).
+
+A review of existing tools, integration constraints and useful ideas is in [related solutions](references/related-solutions.md). The reviewed projects are references, not runtime dependencies.

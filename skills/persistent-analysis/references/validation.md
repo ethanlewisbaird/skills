@@ -6,6 +6,12 @@ Synthetic fixtures only. No scientific datasets, loaded user workspaces or pre-e
 
 The runtime was tested on Linux Slurm compute nodes with Python 3.12.2 and R 4.4.3. Seurat and SeuratObject were already installed in the tested environment. User environment/alias files were inspected but not changed. The bridge defaults to a private shared home-directory registry. The shared development checkout reports broadly writable permissions on this host, so the personal runtime is installed as a private home-directory copy rather than a symlink to that checkout.
 
+## Setup simplification and external review
+
+The agent now has explicit instructions to perform authorized new-session setup and readiness checks itself, rather than delegate a CLI tutorial to the user. Existing manual workspaces still require registration in that interpreter; automatic terminal input is allowed only for an explicitly identified, authorized and verified idle target. No arbitrary pane takeover, new runtime dependency or backend replacement was introduced.
+
+Startup/status metadata now retain a shell-quoted monitor_command. The real tmux/screen launcher test passed in 17.936 seconds, including argument-level assertions that the returned and persisted commands select the intended terminal. Structural validation, Python syntax, relative links, source/installed-copy parity and private permissions were checked. This small launcher-output addition did not trigger a full interpreter-suite rerun; the historical runtime results below remain labeled as such. Eight related repositories were source/documentation-reviewed, not installed or runtime-tested; see related-solutions.md.
+
 ## Current revision: terminal launchers only
 
 At the user's request, the sbatch launcher and its submission/job-ID branches were removed. The Slurm entry script is now `slurm/start-worker.sh`, used only through srun under tmux or screen. The README retains a future-option note; the previous implementation remains in Git history.

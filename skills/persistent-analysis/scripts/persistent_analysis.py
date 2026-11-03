@@ -394,7 +394,8 @@ def launch(args, session):
     title = 'pa-' + args.session
     mux = ['tmux', '-L', 'persistent-analysis', '-f', '/dev/null', 'new-session', '-d', '-s', title, shell] if args.launcher == 'tmux' else ['screen', '-dmS', title, 'bash', '-c', shell]
     subprocess.run(mux, check=True)
-    record = {'launcher': args.launcher, 'terminal_session': title}
+    monitor = ['tmux', '-L', 'persistent-analysis', 'attach', '-t', title] if args.launcher == 'tmux' else ['screen', '-r', title]
+    record = {'launcher': args.launcher, 'terminal_session': title, 'monitor_command': shlex.join(monitor)}
     atomic(session / 'launch.json', record)
     print(json.dumps({'session': str(session), **record}))
 
