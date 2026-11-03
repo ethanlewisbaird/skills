@@ -6,6 +6,12 @@ Synthetic fixtures only. No scientific datasets, loaded user workspaces or pre-e
 
 The runtime was tested on Linux Slurm compute nodes with Python 3.12.2 and R 4.4.3. Seurat and SeuratObject were already installed in the tested environment. User environment/alias files were inspected but not changed. The bridge defaults to a private shared home-directory registry. The shared development checkout reports broadly writable permissions on this host, so the personal runtime is installed as a private home-directory copy rather than a symlink to that checkout.
 
+## Environment discovery and conservative planning policy
+
+Added session-planning.md and routed startup decisions to it. Agents should infer a supported environment and launcher from project/runtime evidence, estimate CPU/RAM conservatively, and request at least 72 hours for new production workers unless explicitly overridden. Ambiguous candidates, uncertain memory and incompatible cluster limits require clarification. Suitable already-loaded sessions are not automatically replaced for having less remaining walltime; short tests/probes remain exempt.
+
+This revision changes instructions/documentation only. Official skill validation, relative-link checks, source/installed-copy parity and manual review of six decision walkthroughs were performed. No autonomous discovery implementation or new agent-level evaluation is claimed; the policy guides the agent's existing shell/Slurm tools. No new worker/job was started and runtime code was unchanged.
+
 ## Setup simplification and external review
 
 The agent now has explicit instructions to perform authorized new-session setup and readiness checks itself, rather than delegate a CLI tutorial to the user. Existing manual workspaces still require registration in that interpreter; automatic terminal input is allowed only for an explicitly identified, authorized and verified idle target. No arbitrary pane takeover, new runtime dependency or backend replacement was introduced.

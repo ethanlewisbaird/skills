@@ -12,7 +12,7 @@ The bootstrap temporarily occupies a manual REPL. Stop the bridge gracefully to 
 
 For an already registered session, just ask for the analysis: “Use my loaded R object to make this plot.” The agent discovers the matching project/session and handles execution and results.
 
-For a new session, say for example: “Start a persistent R session for this project using my chosen conda environment, tmux, 4 CPUs, 32G RAM and 24 hours.” Supply the actual environment and any required partition; the agent asks only for missing details, launches the worker, waits/checks readiness, and returns a monitor command. It can write an initializer and load objects when you authorize the actual paths. You do not need to run the commands below yourself; they also document what the agent does. Previously supplied authorization/preferences need not be repeated, but missing environment/resource choices must not be guessed.
+For a new session, say for example: “Set up a persistent R session for this project.” The agent first looks for the appropriate conda environment and your tmux/screen preference, estimates conservative CPU/memory needs, and plans at least 72 hours of walltime. It asks when evidence is ambiguous, RAM needs cannot be estimated safely, or cluster limits conflict. Once startup is authorized, it launches the worker, checks readiness, and returns a monitor command. It can write an initializer and load objects when you authorize the actual paths. You do not need to run the commands below yourself; they also document what the agent does. Previously supplied authorization/preferences need not be repeated. The agent briefly reports the evidence behind its selection and estimated resources rather than inventing an environment or choosing a large generic allocation. See [session planning](references/session-planning.md) for the discovery/estimation rules.
 
 The one exception is an interpreter you already opened and loaded manually: its memory cannot be reached by launching another interpreter. The agent prepares a bootstrap for that existing prompt. You paste it once, or explicitly identify and authorize a verified idle tmux/screen target for the agent to enter it. A targetless automatic takeover is not supported. Until then it must not pretend to be using your loaded objects.
 
@@ -67,7 +67,7 @@ Example, after choosing appropriate resources and environment:
 ```bash
 persistent-analysis --session scrna-r start --language r \
   --project /shared/project --launcher tmux \
-  --partition YOUR_PARTITION --cpus 4 --mem 32G --time 24:00:00 \
+  --partition YOUR_PARTITION --cpus 4 --mem 32G --time 72:00:00 \
   --env-script /shared/project/activate-r.sh --init /shared/project/init.R
 ```
 
@@ -78,9 +78,9 @@ source /path/to/conda/etc/profile.d/conda.sh
 conda activate YOUR_ENVIRONMENT
 ```
 
-Without it, the launcher's exported environment is used; verify that this is the intended environment. Never assume a particular conda environment. `status` records executable, conda prefix, job/node and resource metadata; `runtime.txt` records interpreter information (R sessionInfo after initialization, or Python version/prefix). Later package changes require a queued inspection, not reliance on the startup snapshot.
+Without it, the launcher's exported environment is used; verify that this is the intended environment. Discover the environment from project manifests, prior successful commands/runtime records and available conda environments; verify the relevant interpreter/packages before using it. An environment name alone is weak evidence; ask when candidates conflict. `status` records executable, conda prefix, job/node and resource metadata; `runtime.txt` records interpreter information (R sessionInfo after initialization, or Python version/prefix). Later package changes require a queued inspection, not reliance on the startup snapshot.
 
-Memory units are mandatory: **`--mem 64G` means 64 GB; Slurm `--mem=64` ordinarily means 64 MB.** The bridge rejects unitless memory. CPU, partition and walltime must fit local policy. Nothing can keep RAM alive beyond Slurm expiration, preemption or node failure.
+Memory units are mandatory: **`--mem 64G` means 64 GB; Slurm `--mem=64` ordinarily means 64 MB.** The bridge rejects unitless memory. CPU, partition and walltime must fit local policy. New production workers request at least 72 hours by default; use one CPU for serial interactive work unless parallel benefit is supported, and base RAM on measured/credible footprint plus modest headroom. This is agent planning policy, not a CLI hard limit: deliberately short test fixtures remain supported. If no permitted partition/QOS supports 72 hours, ask rather than shorten the request or select privileged resources. Nothing can keep RAM alive beyond Slurm expiration, preemption or node failure.
 
 The tmux launcher uses its own server/socket and no personal tmux configuration:
 
