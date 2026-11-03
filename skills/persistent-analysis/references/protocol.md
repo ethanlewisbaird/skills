@@ -1,0 +1,26 @@
+# Queue and lifetime contract
+
+A registry root and each session must be owned by the current UID, non-symlinked and mode 700. Requests/status/logs use mode 600 under the private session. Keep the registry on a shared filesystem visible to login and compute nodes; login-node `/tmp` is unsuitable. It is not a sandbox: authorized scripts run as the user and can change files and objects. Never expose the queue to other accounts or store it in a public repository.
+
+`session.json` records language, project, creation time and optional initialization-script hash. `launch.json` retains the launcher, terminal-session name or submitted sbatch job ID even before the interpreter is ready. `worker.json` records state, PID, node and Slurm job ID. `heartbeat.json` is maintained by a small monitor on the compute node, independently of the busy interpreter. `worker-claimed/` is a permanent, exclusive generation claim; it deliberately prevents a second interpreter or automatic restart in the same session directory. Session names cannot be reused. Prepare a new name when deliberately replacing a worker.
+
+Submission writes a complete private temporary directory, then renames it atomically to `queue/TASK_ID`. The worker moves it once to `tasks/TASK_ID`, marks it running, and runs the saved code. A reader tolerates the one queue-to-task move. Completion atomically replaces `state.json`. Tasks are processed in sorted timestamp/UUID order; the worker is single-threaded. Timestamps from different submitter machines need synchronized clocks for intuitive FIFO ordering, but mutation remains sequential regardless.
+
+This is **at-most-once automatic execution**, not an exactly-once transaction. A worker can die after claiming but before execution, or after mutating objects before recording success. Such tasks are never automatically requeued. A new task ID is a deliberate new execution, even if the source is identical. Do not infer completion from generated files alone. Partial changes survive an ordinary R/Python exception; no implicit copy, rollback or checkpoint is performed.
+
+Task records retain source code/hash/original path, working directory, submission/start/finish times, stdout, stderr and explicitly registered output paths. `result`/`logs` show at most 16 KiB per stream with a full-log path when truncated. Scripts can register existing output files through `persistent_paths`; arbitrary filesystem changes are not automatically discovered or rolled back. Do not write private metadata to broadly accessible project outputs simply because the queue is private.
+
+Sbatch requests may show `allocation-pending` or `starting` before interpreter initialization; their job ID is retained at submission. The worker is `initializing` while loading authorized new-session initialization, then `ready` to accept sequential tasks (it may already be busy with one). `active_task` identifies the claimed task when present. Tasks are queued/running/successful/failed; CLI results also distinguish interrupted and not-executed after worker loss. The state `ready` is availability, not a promise of instantaneous execution.
+
+The monitor refreshes every two seconds; idle workers poll once per second. CLI waits poll once per second, with a configurable deadline. A stale heartbeat is `unresponsive`, not proof that a task failed. Slurm reports an ended/missing allocation as `allocation-ended`; scheduler errors remain explicitly unavailable. Abruptly killed processes become `terminated` when the monitor survives long enough to observe them. If the entire allocation is killed, its monitor also dies and scheduler/heartbeat checks detect the loss. A transient filesystem or scheduler outage can leave uncertain state: do not replay or automatically restart.
+
+# Recovery and shutdown
+
+- Ordinary script error: inspect stderr and affected objects, correct the saved script and submit a NEW task only after assessing partial mutations.
+- CLI wait timeout: retain ID and poll; it never kills the task.
+- Interpreter crash/OOM/walltime expiration: preserve the session directory. Find the Slurm exit reason through normal scheduler tools. Prepare/start a different session name only with approval. Load a deliberate checkpoint if one exists; otherwise lost RAM requires a reload.
+- Manual bootstrap: graceful `shutdown --confirm` finishes the active task, stops taking queued tasks, and returns to the original REPL. Queued tasks then report not-executed. Ctrl-C during a task marks that task failed and returns to the REPL; inspect partial state. Do not send Ctrl-C through a shared terminal without authorization.
+- Dedicated worker: graceful shutdown ends that worker process and its own Slurm allocation; it does not issue scancel. tmux/screen cannot extend allocation walltime.
+- Retention: no automatic queue/log deletion. After a confirmed stopped generation, explicitly archive/remove its registry directory if authorized. Never remove a live registry or another user's sessions.
+
+Atomic rename/fsync are used for ordinary consistency, not a claim of power-loss durability or identical locking/cache behavior on every network filesystem. There is no automatic cleanup/restart after filesystem failures. A dead startup can leave a prepared record, which should be diagnosed rather than silently reused.

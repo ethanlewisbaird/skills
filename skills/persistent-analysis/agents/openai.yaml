@@ -1,0 +1,4 @@
+interface:
+  display_name: "Persistent R and Python Analysis"
+  short_description: "Reuse in-memory R and Python sessions on Slurm"
+  default_prompt: "Use $persistent-analysis to inspect and reuse my loaded R or Python session."

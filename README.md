@@ -7,6 +7,7 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | Skill | Purpose |
 | --- | --- |
 | [bioinformatics-socratic-mentor](skills/bioinformatics-socratic-mentor/SKILL.md) | Delegate computation while developing the scientific reasoning needed to challenge and defend an analysis. Includes five teaching modes, active assessment, scientific validity safeguards, and optional private learning records. |
+| [persistent-analysis](skills/persistent-analysis/SKILL.md) | Reuse loaded R/Seurat and Python interpreters across tasks/conversations through private Slurm queues; supports existing manual sessions and new tmux/screen/sbatch workers. |
 
 The mentor defaults to **Balanced**: autonomous routine execution, concise explanations, and occasional focused questions at major milestones. Other modes are Intensive learning, Assessment first, Autonomous research, and Review session. Say **“Mentoring off for this session”** to disable teaching and learning-record use. Scientific validity warnings remain active.
 

@@ -1,0 +1,35 @@
+---
+name: persistent-analysis
+description: Reuse loaded R/Seurat or Python objects in a persistent Slurm interpreter across tasks and conversations. Discover private filesystem-queue sessions, attach existing R/radian or Python/IPython interpreters, and explicitly launch new workers under tmux, screen or sbatch when authorized. Use for consecutive analyses and plots on in-memory objects; not for unrelated terminal administration.
+license: MIT
+---
+
+# Persistent R and Python Analysis
+
+Keep the interpreter and its loaded objects, not just the terminal. Read [README.md](README.md) for first-time setup, bootstrap, environment selection and launcher usage. Read [references/protocol.md](references/protocol.md) before diagnosing a stale session or recovering a task. The CLI is `bin/persistent-analysis` relative to this skill directory; resolve that path rather than assuming PATH installation. There is no MCP/network service or external Python/R package dependency in the bridge. Even object inventory submits a queue task, so the agent needs write access to both the private registry and project; a read-only sandbox can check status but cannot execute. Report missing access rather than bypassing host permissions.
+
+## Discover and reuse
+
+1. Run `persistent-analysis list` on the login node. Registry default: `~/.local/state/persistent-analysis`; override with `--root` or `PERSISTENT_ANALYSIS_ROOT`. It is independent of conversation history. Match project, language, live worker, environment and allocated resources. If multiple plausible sessions exist, ask which to use. Never select by recency alone.
+2. Run `--session NAME status`, then `--session NAME objects`. Inventory is itself a queued, read-only task; it may wait behind current work. Inspect only relevant metadata, versions, identities/assays/reductions or Python shapes/dtypes. Do not dump full objects, patient metadata or huge arrays. Do not copy an object to inspect it.
+3. Use loaded objects and existing derived variables. A new command is a new task in the **same interpreter**, not a new Rscript/Python process. Never reload packages/data or recompute an embedding merely because the conversation changed. Inspect current state before trusting a name.
+
+## Execute reproducibly
+
+Inspect project code/imports and conventions first. Save each analysis as a readable `.R` or `.py` script in the existing analysis directory; avoid throwaway production snippets. For short read-only inspection, `eval 'expression'` also saves its code to the task record. Review assignments and file paths: ask before overwriting important objects/results or removing state. Ordinary failed scripts can leave partial object mutations; errors do not roll back the workspace.
+
+Use `--session NAME run analysis.R` (or `.py`) for a bounded wait, or `submit analysis.R` followed by `result TASK_ID --timeout 30`. Preserve the task ID, session name and registry path in the existing project narrative/log so a later conversation can resume polling. Exit 124 means **only the CLI wait timed out**; do not resubmit or kill the calculation. Use `logs TASK_ID` and the recorded task directory for full stdout/stderr. Terminal errors are nonzero. Queued/running results remain pending.
+
+Scripts execute sequentially in the chosen interpreter and project working directory. R expressions use `.GlobalEnv`; Python uses the attached user namespace. New variables persist. Use `persistent_paths("relative/output.png", "table.csv")` inside R or Python to register generated files. Save figures as explicit PNGs under the user's conventions; do not trigger R's default PDF device. Close only the graphics devices/figures opened by the task, including on errors, using R tryCatch/finally or Python try/finally; do not close unrelated user devices. Read the returned files and verify the actual outputs. Large tables, arrays and diagnostics belong in files, not the response. Join task-created background work before returning; fire-and-forget threads/futures would break sequential mutation assumptions.
+
+## Existing manual sessions
+
+`prepare --language r|python --project PATH` creates a private registry entry and prints a bootstrap to execute **once in the intended existing compute-node interpreter**. It does not start a job or initialize/reload objects. Explain that the foreground queue loop temporarily occupies the REPL; graceful `shutdown --confirm` or Ctrl-C returns to the same manual interpreter with its objects. Get agreement before handing an existing user-controlled interpreter to the queue. Never inject keystrokes into arbitrary tmux/screen panes or pretend an ordinary radian/IPython process is already connected. The same bootstrap works regardless of which multiplexer holds that interpreter.
+
+## New sessions and boundaries
+
+If no suitable worker is available, report the actual state. Ask for the project, language/environment, object initialization and resource budget needed for an explicit `start`. Never silently allocate, reconnect a stale generation, reload data, or replay a claimed task. `start` supports tmux, screen and sbatch with explicit memory units, walltime, CPU count and optional environment script. A new session loads its authorized init script once. The launcher uses Slurm and shared files; no direct compute-node SSH or incoming connection is required. Do not alter/cancel pre-existing jobs.
+
+Use a separate authorized Slurm job for heavy independent/parallel work that should not block the interactive interpreter or exceeds its allocation; document any deliberate data reloading required for that independent process. Scientific validity and understanding remain distinct from session execution: e.g. donor-aware treatment inference is still necessary even if a Seurat object is already loaded.
+
+Never stop the persistent interpreter, request shutdown, cancel its allocation, change its environment, or erase its registry without explicit authorization. On stale/unresponsive/interrupted state, preserve scripts/logs, inspect scheduler/runtime metadata, and report uncertainty. A Slurm allocation cannot survive its walltime, and lost RAM cannot be recovered without a deliberate checkpoint/reload. Checkpoints (`saveRDS`/appropriate Python format) are explicit user-authorized tasks, not automatic snapshots of multi-gigabyte objects.
