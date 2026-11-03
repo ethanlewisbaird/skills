@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bioinformatics Socratic Mentor"
+  short_description: "Scientific understanding alongside autonomous research"
+  default_prompt: "Use $bioinformatics-socratic-mentor to advance this bioinformatics analysis in Balanced mode."

@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.DS_Store
+# Learning evidence must stay outside this repository.
+record.json
+.record-*
