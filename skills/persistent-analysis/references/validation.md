@@ -6,6 +6,12 @@ Synthetic fixtures only. No scientific datasets, loaded user workspaces or pre-e
 
 The runtime was tested on Linux Slurm compute nodes with Python 3.12.2 and R 4.4.3. Seurat and SeuratObject were already installed in the tested environment. User environment/alias files were inspected but not changed. The bridge defaults to a private shared home-directory registry. The shared development checkout reports broadly writable permissions on this host, so the personal runtime is installed as a private home-directory copy rather than a symlink to that checkout.
 
+## Dataset/analysis/language session scope
+
+Clarified that workspace selection must match dataset/object provenance and analysis scope as well as project/language. Naming guidance now includes dataset, analysis and R/Python, with distinct workspaces for unrelated scopes and reuse for related plot revisions. Existing worker labels are not interpreted as global language hubs. Live registry paths, jobs, interpreters and objects were not renamed or modified.
+
+This revision changes documentation/agent guidance only. The CLI still stores project/language and initializer provenance; explicit dataset/analysis scope is documented in the existing project session note and verified by the agent, not enforced by new metadata fields. Structural validation, relative links and source/installed-copy parity passed. Manual review covered same-project/different-dataset selection, same-scope plot reuse and preserving a matching live worker with an older vague name. No new agent execution test or worker allocation is claimed.
+
 ## Empty-registry fallback regression
 
 A user-reported workflow checked the registry, received an empty list, then repeatedly ran a one-shot large-object plotting entrypoint. The skill/runtime was not used for those analyses beyond discovery. Read-only inspection also found a terminating quit call in the batch plotting branch. No scientific dataset or project script was modified for this fix.

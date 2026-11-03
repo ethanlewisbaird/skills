@@ -2,6 +2,12 @@
 
 Apply this when selecting or starting an R/Python worker. Prefer a suitable already-loaded session: discovery is not a reason to reload data, take over a terminal, or allocate another worker. Explicit user choices take priority over inferred preferences.
 
+## Dataset/analysis identity comes first
+
+Use one logical workspace per **project + dataset + analysis scope + language**, not one global workspace for all R or all Python work. Inspect project notes, the initialization script and relevant loaded-object metadata to identify the actual dataset/source revision and purpose. Matching a directory, environment, language or a generic variable name such as obj/x is not enough. If provenance/scope is ambiguous, ask. Multiple samples and related derived objects may share a declared analysis workspace; a separate worker per plot or per biological sample would be unnecessary.
+
+Choose a concise session name including dataset, analysis and language, with project context when helpful. Document the scope and object bindings in the existing session note. A different dataset, independent analysis or language requires a distinct scope/name when a worker is needed. Reuse the matching scoped worker for revisions; do not silently combine scopes to save RAM, or duplicate a matching workspace just to get a better name. Preserve live worker paths, jobs and object state when improving documentation. New generations need a new name as usual.
+
 ## Environment discovery
 
 Read the active project's instructions and imports first. Look for environment.yml/conda lock files, activation/launcher scripts, renv.lock and R library paths, Python environment declarations, and prior successful analysis/runtime records. Existing session metadata (conda_prefix, executable and runtime.txt) is strong evidence for that session, but still check that it matches the requested project and package versions. Do not silently switch the environment of a running interpreter.
@@ -42,4 +48,7 @@ After startup, verify the actual allocation, interpreter/environment and object 
 | Empty registry but environment or safe RAM budget is unresolved | Ask a focused clarification before loading; do not silently run a 15-minute Rscript job |
 | Registered worker reports a missing feature or a plot layout needs changing | Correct the script and submit a new task to the same worker; no new interpreter or repeated readRDS/read_h5ad |
 | Existing plotting entrypoint contains readRDS and quit | Separate initialization from a persistent-safe plotting function/script; never queue quit or use a throwaway process merely to avoid adaptation |
+| Same project and language, but a different dataset or independent analysis scope | Use a distinct scoped worker when authorized/needed; do not pool unrelated objects into the existing language workspace |
+| Same dataset and analysis, only the plot or legend changes | Reuse the same worker and derived objects; no per-figure allocation |
+| Old session has a vague name but confirmed matching provenance/scope | Reuse safely and document the scope; do not rename its live registry or restart just for naming |
 | Explicit short test request | Keep it short; the 72-hour production preference does not apply |
