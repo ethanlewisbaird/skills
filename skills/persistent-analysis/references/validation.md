@@ -6,6 +6,23 @@ Synthetic fixtures only. No scientific datasets, loaded user workspaces or pre-e
 
 The runtime was tested on Linux Slurm compute nodes with Python 3.12.2 and R 4.4.3. Seurat and SeuratObject were already installed in the tested environment. User environment/alias files were inspected but not changed. The bridge defaults to a private shared home-directory registry. The shared development checkout reports broadly writable permissions on this host, so the personal runtime is installed as a private home-directory copy rather than a symlink to that checkout.
 
+## Empty-registry fallback regression
+
+A user-reported workflow checked the registry, received an empty list, then repeatedly ran a one-shot large-object plotting entrypoint. The skill/runtime was not used for those analyses beyond discovery. Read-only inspection also found a terminating quit call in the batch plotting branch. No scientific dataset or project script was modified for this fix.
+
+The entrypoint instructions now require persistent setup or clarification when the registry is empty, including for ordinary plotting requests rather than only explicit startup requests. Existing scripts must be inspected for repeated loads, commandArgs-driven CLI dispatch, workspace clearing and quit/q/sys.exit before adaptation. One-time initialization is separate from repeatable plotting; feature errors and cosmetic revisions must keep the same worker. Lightweight report/file utilities and explicitly authorized independent jobs remain separate cases. Main personal and repository AGENTS instructions were strengthened without changing unrelated content.
+
+A fresh Codex CLI 0.166.0 process (gpt-6.1-sol), read-only, ephemeral, through a one-CPU/1-GiB/four-minute Slurm allocation, evaluated four independent synthetic next-action scenarios using the revised skill/configuration. It was prohibited from reading validation/tests, loading real data, accessing real projects/registries, starting/stopping analysis jobs or editing files. Expected answers were withheld. Manual review observed:
+
+| Case | Observed next action |
+| --- | --- |
+| Empty registry, ordinary reporter-plot request, verified environment/initializer/tmux/72-hour partition and credible RAM budget | Planned one-CPU/8G/72-hour persistent startup and one initial load, then feature inspection/queued plotting; no extra setup confirmation or one-shot fallback |
+| Empty registry with uncertain environment, launcher and memory requirements | Asked about those missing facts and paused loading/startup instead of using a short job |
+| Healthy loaded worker after a missing reporter feature, followed by a single-panel revision | Planned separate corrected tasks in the same worker using the loaded object/saved embedding |
+| Existing CLI plotting entrypoint contains readRDS, commandArgs and quit | Planned extracting/adapting persistent-safe plotting code, excluding dispatch, reload and termination |
+
+All four matched the held-out decision expectations. These are next-action behavioral evaluations, not executions of the real plotting task and not proof that every future model response will comply. No runtime code changed. Official structural validation, relative links, source/installed-copy parity and preservation of the unrelated main AGENTS content were checked. Temporary evaluation artifacts were removed after capturing this evidence.
+
 ## Environment discovery and conservative planning policy
 
 Added session-planning.md and routed startup decisions to it. Agents should infer a supported environment and launcher from project/runtime evidence, estimate CPU/RAM conservatively, and request at least 72 hours for new production workers unless explicitly overridden. Ambiguous candidates, uncertain memory and incompatible cluster limits require clarification. Suitable already-loaded sessions are not automatically replaced for having less remaining walltime; short tests/probes remain exempt.
