@@ -40,7 +40,7 @@ package version, inspect the installed help and current authoritative documentat
 ## Interactive analysis
 
 Read [scientific decisions and execution](references/scientific_decisions.md) for
-the relevant stage, including concrete API examples and validation commands.
+the relevant stage, including concrete API examples and stage-specific checks.
 
 - **Preview first.** Import/adopt, calculate appropriate QC metrics, and save initial
   distributions, violin plots, densities and count/gene/mitochondrial scatter plots
@@ -92,12 +92,9 @@ the relevant stage, including concrete API examples and validation commands.
   dataset dependent. Bind decisions to the current `partition_id`, use named
   mappings, preserve prior labels, and document reasons. Never transfer a numeric
   cluster ID from another run. Regenerate affected markers and figures afterward.
-- **Preserve requested marker styling.** Use `qc_plot_marker_dotplot()` for the
-  top ten (or explicitly requested number) of markers: dot scale 6, rotated size-7
-  labels, white-to-forestgreen gradient, limits 0–2.5 and squishing outside those
-  limits. Replot loaded marker results without repeating marker testing. DotPlot's
-  default scaled averages are relative expression summaries; white includes negative
-  scaled means under this display convention and does not imply zero expression.
+- **Preserve requested marker styling.** When creating or revising marker plots,
+  read [marker plotting](references/marker_plotting.md) for selection, display
+  settings and interpretation. Reuse loaded marker results for replots.
 - **Describe evidence honestly.** Cluster markers and cluster-pair comparisons are
   exploratory; same-data clustering and testing do not establish independent
   statistical evidence. Do not interpret nominal p-values as justification for a
@@ -113,8 +110,8 @@ the relevant stage, including concrete API examples and validation commands.
 - **Save every produced plot as high-quality `.jpeg`: at least 300 dpi, quality 100,
   white background, sufficient physical size for legible labels.** Use
   `qc_save_plot()`; avoid implicit graphics devices and unsaved diagnostic plots.
-  Inspect generated JPEGs before presenting them. This explicit JPEG preference
-  overrides PNG suggestions in companion skills. Paginate crowded plots as needed.
+  Inspect generated JPEGs before presenting them. Follow an explicit user override
+  when another format is requested. Paginate crowded plots as needed.
 - Keep one question-level directory, selected figures in `figs/`, necessary tables
   in `tables/`, accepted/justified checkpoints in `objects/`, and maintained scripts
   in `code/`. Reuse its existing `analysis.html` and report generator; ask before
@@ -133,3 +130,7 @@ the relevant stage, including concrete API examples and validation commands.
   if a generator exists, modify it instead so rerendering retains the narrative.
   Identify accepted outputs in the existing project README. Commit checked source
   and documentation only, leaving large/generated outputs outside Git.
+
+For skill development or evaluation, read [validation](references/validation.md)
+for historical findings, test commands and limitations. It is not needed for routine
+analysis.

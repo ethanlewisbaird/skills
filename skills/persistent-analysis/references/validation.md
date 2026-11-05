@@ -6,6 +6,30 @@ Synthetic fixtures only. No scientific datasets, loaded user workspaces or pre-e
 
 The runtime was tested on Linux Slurm compute nodes with Python 3.12.2 and R 4.4.3. Seurat and SeuratObject were already installed in the tested environment. User environment/alias files were inspected but not changed. The bridge defaults to a private shared home-directory registry. The shared development checkout reports broadly writable permissions on this host, so the personal runtime is installed as a private home-directory copy rather than a symlink to that checkout.
 
+## Writing-guidance revision — 2026-11-05
+
+Consolidated worker selection and setup authorization into one sequence in SKILL.md;
+README and planning guidance now refer to it. Figure instructions follow local
+conventions, and the example demonstrates JPEG output. No bridge/runtime code changed.
+
+All three repository skills passed the official structural validator; 42 relative
+Markdown links, including heading links, resolved. Manual walkthroughs covered a
+verified loaded worker, an empty registry with established setup details, ambiguous
+setup, pending/failed state and attachment of a loaded manual interpreter. These
+were instruction reviews, not new independent-agent behavioral tests.
+
+The revised `examples/plot_umap.R` passed a synthetic Slurm check as job `40459`:
+`srun --partition=fast --ntasks=1 --cpus-per-task=1 --mem=4G --time=00:05:00`
+with `/data/ebaird/miniconda3/envs/R_process7/bin/Rscript --vanilla`, serial
+BLAS/OpenMP, R 4.4.2, Seurat 5.3.0 and SeuratObject 5.1.0. The fixture used seed 1,
+a 20-gene/12-cell count matrix and an assigned two-dimensional embedding. It verified
+unchanged object state, registered output, a closed graphics device and no implicit
+PDF. The JPEG header, 2400 × 2000 dimensions and 300 dpi metadata were checked;
+the image was visually inspected. An initial fixture assertion assumed the wrong
+null-device label; correcting that assertion required no example-code change.
+Temporary fixture files were removed. Source was baseline `142bd6c` plus the
+uncommitted writing-guidance revision recorded by the enclosing Git commit.
+
 ## Dataset/analysis/language session scope
 
 Clarified that workspace selection must match dataset/object provenance and analysis scope as well as project/language. Naming guidance now includes dataset, analysis and R/Python, with distinct workspaces for unrelated scopes and reuse for related plot revisions. Existing worker labels are not interpreted as global language hubs. Live registry paths, jobs, interpreters and objects were not renamed or modified.

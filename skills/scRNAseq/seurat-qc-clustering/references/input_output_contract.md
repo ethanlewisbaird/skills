@@ -133,7 +133,7 @@ Plotting APIs retain the interactive workflow:
 | `qc_plot_elbow()` | Saved PCA elbow and numerical PC standard deviations before choosing a range |
 | `qc_plot_qc_umap()` | Combined QC/key-gene panels, Phase/doublet classes and cluster view |
 | `qc_umap_sweep()` | Explicit PC/UMAP-neighbor/min.dist table, with cluster/key-gene grids |
-| `qc_top_markers()` / `qc_plot_marker_dotplot()` | Reuse marker results with the requested top-n and white/forestgreen style |
+| `qc_top_markers()` / `qc_plot_marker_dotplot()` | Reuse marker results with the requested selection and display settings; see [marker plotting](marker_plotting.md) |
 
 Plot helpers do not choose scientific cutoffs or accepted clustering settings.
 UMAP layout sweeps leave the caller's model unchanged. Group pagination retains

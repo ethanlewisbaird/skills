@@ -1,10 +1,11 @@
-# Requires an existing loaded `obj` and an existing UMAP reduction; does not recompute it.
+# Requires a loaded `obj` and UMAP reduction; adapt output settings to project conventions.
 stopifnot(exists("obj"), inherits(obj, "Seurat"), "umap" %in% SeuratObject::Reductions(obj))
 local({
-    dir.create("figures", showWarnings = FALSE)
-    destination <- "figures/umap.png"
+    dir.create("figs", showWarnings = FALSE)
+    destination <- "figs/umap.jpeg"
     if (file.exists(destination)) stop("Output exists; choose a new path or authorize replacement")
-    grDevices::png(destination, width = 1800, height = 1500, res = 180)
+    grDevices::jpeg(destination, width = 2400, height = 2000, res = 300,
+                   quality = 100, bg = "white")
     tryCatch(print(Seurat::DimPlot(obj, reduction = "umap")),
              finally = grDevices::dev.off())
     persistent_paths(destination)
