@@ -1,0 +1,3 @@
+interface:
+  display_name: "Seurat QC and clustering"
+  short_description: "Interactive scRNA-seq QC and clustering in persistent R"

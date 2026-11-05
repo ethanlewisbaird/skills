@@ -8,6 +8,12 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | --- | --- |
 | [bioinformatics-socratic-mentor](skills/bioinformatics-socratic-mentor/SKILL.md) | Delegate computation while developing the scientific reasoning needed to challenge and defend an analysis. Includes five teaching modes, active assessment, scientific validity safeguards, and optional private learning records. |
 | [persistent-analysis](skills/persistent-analysis/SKILL.md) | Reuse loaded R/Seurat and Python interpreters across tasks/conversations through private Slurm queues; supports existing manual sessions and new tmux/screen workers. |
+| [seurat-qc-clustering](skills/scRNAseq%20skills/seurat-qc-clustering/SKILL.md) | Interactive Seurat QC and clustering: flexible inputs/metadata, dataset-specific QC, capture-aware doublets, diagnostic plots, user-selected sweeps and checkpoint resume in persistent R. |
+
+The scRNA-seq collection is under `skills/scRNAseq skills/`. Install the complete
+`seurat-qc-clustering` subfolder using the discovery paths below; quote its source
+path because the collection directory contains a space. This skill requires R/Seurat,
+Slurm, and the companion persistent-analysis workflow.
 
 The mentor defaults to **Balanced**: autonomous routine execution, concise explanations, and occasional focused questions at major milestones. Other modes are Intensive learning, Assessment first, Autonomous research, and Review session. Say **“Mentoring off for this session”** to disable teaching and learning-record use. Scientific validity warnings remain active.
 
@@ -45,7 +51,7 @@ The shared `SKILL.md` format is supported by [Codex](https://learn.chatgpt.com/d
 
 Useful switches: “Teach me more”, “Quiz me”, “I want to write this part”, “Complete autonomy today”, “Review what I've struggled with”, and “Skip this question”. A skipped exercise is not evidence of understanding or misunderstanding.
 
-The distributed version follows each user's name preferences and project conventions. It does not require a particular salutation, Slurm installation, report format, or local directory layout. On an HPC, it follows the project's scheduling requirements.
+The distributed mentoring skill follows each user's name preferences and project conventions. It does not require a particular salutation, Slurm installation, report format, or local directory layout. On an HPC, it follows the project's scheduling requirements.
 
 ## Optional learning record
 
