@@ -9,10 +9,21 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [bioinformatics-socratic-mentor](skills/bioinformatics-socratic-mentor/SKILL.md) | Delegate computation while developing the scientific reasoning needed to challenge and defend an analysis. Includes five teaching modes, active assessment, scientific validity safeguards, and optional private learning records. |
 | [persistent-analysis](skills/persistent-analysis/SKILL.md) | Reuse loaded R/Seurat and Python interpreters across tasks/conversations through private Slurm queues; supports existing manual sessions and new tmux/screen workers. |
 | [seurat-qc-clustering](skills/scRNAseq/seurat-qc-clustering/SKILL.md) | Interactive Seurat QC and clustering: flexible inputs/metadata, dataset-specific QC, capture-aware doublets, diagnostic plots, user-selected sweeps and checkpoint resume in persistent R. |
+| [single-cell-plot-style](skills/scRNAseq/single-cell-plot-style/SKILL.md) | Ethan's default feature/module-map palette, shared feature limits, and white-to-forest-green expression dotplots on a 0–2.5 colour scale. Includes reusable R plot components. |
 
 The scRNA-seq collection is under `skills/scRNAseq/`. Install the complete
 `seurat-qc-clustering` subfolder using the discovery paths below. This skill requires R/Seurat,
 Slurm, and the companion persistent-analysis workflow.
+
+`single-cell-plot-style` is a personal style skill. Install its whole folder using
+the same discovery directories. For a standing Codex default, add to your global
+`~/.codex/AGENTS.md`: “For single-cell feature plots, module-score maps, and
+expression dotplots, use `single-cell-plot-style` unless Ethan requests otherwise.”
+Source its `scripts/single_cell_plot_style.R` from the resolved skill directory.
+The helper uses ggplot2, scales, and colorRamps without modifying global themes or
+analysis objects. Feature limits remain analysis-specific; compared genotype
+panels share limits for each feature. The 0–2.5 range applies to expression
+dotplots, not enrichment results or module-score maps.
 
 The mentor defaults to **Balanced**: autonomous routine execution, concise explanations, and occasional focused questions at major milestones. Other modes are Intensive learning, Assessment first, Autonomous research, and Review session. Say **“Mentoring off for this session”** to disable teaching and learning-record use. Scientific validity warnings remain active.
 
@@ -68,6 +79,12 @@ Replace `inspect` with `export`, `validate`, `disable`, `enable`, or `erase` as 
 Never store patient/sample identifiers, secrets, confidential data excerpts, or raw learner answers. Store only sanitized conceptual evidence outside repositories. The `--sanitized` flag is the caller's assertion, not a privacy detector. Learning records are not included in this repository.
 
 ## Validation and compatibility
+
+`single-cell-plot-style` passed skill validation and synthetic R checks on
+2026-11-05 (Slurm job 40501; R 4.4.2, ggplot2 4.0.2, scales 1.4.0,
+colorRamps 2.3.4): shared feature-colour mappings across different panel ranges,
+retained negative scores, dotplot endpoint saturation, explicit palette overrides,
+and 300 dpi JPEG export. These checks did not load scientific analysis objects.
 
 Run the isolated helper tests on Linux:
 

@@ -1,0 +1,3 @@
+interface:
+  display_name: "Single-cell plot style"
+  short_description: "Ethan’s preferred single-cell colours and aesthetics"
