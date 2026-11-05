@@ -308,16 +308,16 @@ interpreter/allocation were not reconfigured or restarted.
 
 ### Reproducible functional tests
 
-From the skills repository, with the verified environment (quote the folder name):
+From the skills repository, with the verified environment:
 
 ```bash
 srun --partition=fast --ntasks=1 --cpus-per-task=2 --mem=8G --time=00:20:00 \
   /data/ebaird/miniconda3/envs/R_process7/bin/Rscript --vanilla \
-  'skills/scRNAseq skills/seurat-qc-clustering/tests/test_workflow.R'
+  'skills/scRNAseq/seurat-qc-clustering/tests/test_workflow.R'
 
 srun --partition=fast --ntasks=1 --cpus-per-task=1 --mem=5G --time=00:05:00 \
   env PATH=/data/ebaird/miniconda3/envs/R_process7/bin:/data/ebaird/miniconda3/bin:/usr/bin:/bin \
-  /data/ebaird/miniconda3/bin/python 'skills/scRNAseq skills/seurat-qc-clustering/tests/test_persistent.py'
+  /data/ebaird/miniconda3/bin/python 'skills/scRNAseq/seurat-qc-clustering/tests/test_persistent.py'
 ```
 
 These use synthetic fixtures and a test-owned temporary queue worker. Private queue
@@ -360,9 +360,9 @@ diagnostic UMAP grids, layout sweeps and marker styling were visually inspected.
 Temporary figures were removed after review. No March analysis was rerun.
 
 Repository placement was corrected on 2026-11-05 to
-`ethanlewisbaird/skills`, under `skills/scRNAseq skills/seurat-qc-clustering`.
+`ethanlewisbaird/skills`, under `skills/scRNAseq/seurat-qc-clustering`.
 The analysis implementation is unchanged. Workflow validation passed as job `40455`
-from that path, including R's space-encoded script-path handling; persistent queue
+before the collection-folder rename, including R's space-encoded script-path handling; persistent queue
 validation passed as job `40454`. The tests no longer source a pipeline entrypoint,
 and the run record resolves its Git root from the skill location. Existing validation
 records remain historical evidence; generated figures/logs are excluded from Git.

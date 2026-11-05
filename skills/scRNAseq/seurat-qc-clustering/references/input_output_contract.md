@@ -151,8 +151,8 @@ cutoffs, gene exclusions or cluster mappings from that export are defaults here.
 Runtime code and tests are independent of the pipeline repository.
 
 The maintained source is
-`/data/ebaird/skills/skills/scRNAseq skills/seurat-qc-clustering`, published at
-`https://github.com/ethanlewisbaird/skills/tree/main/skills/scRNAseq%20skills/seurat-qc-clustering`.
+`/data/ebaird/skills/skills/scRNAseq/seurat-qc-clustering`, published at
+`https://github.com/ethanlewisbaird/skills/tree/main/skills/scRNAseq/seurat-qc-clustering`.
 Ethan's installation is a private copy at
 `/home/ebaird/.codex/skills/seurat-qc-clustering`, discovered through
 `/home/ebaird/.agents/skills/seurat-qc-clustering`. Make maintained changes in the
