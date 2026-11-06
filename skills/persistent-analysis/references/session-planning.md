@@ -2,11 +2,11 @@
 
 Apply this when selecting or starting an R/Python worker. Prefer a suitable already-loaded session: discovery is not a reason to reload data, take over a terminal, or allocate another worker. Explicit user choices take priority over inferred preferences.
 
-## Dataset/analysis identity comes first
+## Dataset/object identity comes first
 
-Use one logical workspace per **project + dataset + analysis scope + language**, not one global workspace for all R or all Python work. Inspect project notes, the initialization script and relevant loaded-object metadata to identify the actual dataset/source revision and purpose. Matching a directory, environment, language or a generic variable name such as obj/x is not enough. If provenance/scope is ambiguous, ask. Multiple samples and related derived objects may share a declared analysis workspace; a separate worker per plot or per biological sample would be unnecessary.
+Use one logical workspace per **dataset or integration object**, with a compatible language/environment. Different research questions, analysis directories, conversations, subsets and plots reuse that worker and its loaded objects. Related derived objects can remain alongside the shared source object. Inspect project notes, the initialization script and relevant loaded-object metadata to identify the actual dataset/source revision. Matching a directory, environment, language or a generic variable name such as obj/x is not enough. If object provenance is ambiguous, ask.
 
-Choose a concise session name including dataset, analysis and language, with project context when helpful. Document the scope and object bindings in the existing session note. A different dataset, independent analysis or language requires a distinct scope/name when a worker is needed. Reuse the matching scoped worker for revisions; do not silently combine scopes to save RAM, or duplicate a matching workspace just to get a better name. Preserve live worker paths, jobs and object state when improving documentation. New generations need a new name as usual.
+Choose a concise session name identifying the dataset/integration object and language, with project or object-version context when helpful. Document object bindings in the existing session note. Separate workers are appropriate for unrelated datasets, incompatible object versions or runtime requirements, or an authorized heavy independent workload that exceeds or would block the shared worker. A busy worker normally accepts queued work; a new question alone is not a reason to duplicate its loaded object. When several workers already hold the same object, inspect provenance, derived state and availability to select an existing worker; ask if the choice remains ambiguous. Preserve live worker paths, jobs and object state when improving documentation. New generations need a new name as usual.
 
 ## Environment discovery
 
@@ -49,7 +49,9 @@ Retain the chosen settings/evidence in the existing project session note, so lat
 | Empty registry but environment or safe RAM budget is unresolved | Ask a focused clarification before loading; do not silently run a 15-minute Rscript job |
 | Registered worker reports a missing feature or a plot layout needs changing | Correct the script and submit a new task to the same worker; no new interpreter or repeated readRDS/read_h5ad |
 | Existing plotting entrypoint contains readRDS and quit | Separate initialization from a persistent-safe plotting function/script; never queue quit or use a throwaway process merely to avoid adaptation |
-| Same project and language, but a different dataset or independent analysis scope | Use a distinct scoped worker when authorized/needed; do not pool unrelated objects into the existing language workspace |
-| Same dataset and analysis, only the plot or legend changes | Reuse the same worker and derived objects; no per-figure allocation |
-| Old session has a vague name but confirmed matching provenance/scope | Reuse safely and document the scope; do not rename its live registry or restart just for naming |
+| Same integration object, new question such as cell states, iCLIP overlap or neuronal summaries | Reuse the loaded worker across these analyses, including related subsets and derived objects |
+| Matching worker is busy with another analysis of the same object | Queue the task in that worker unless an authorized heavy independent workload justifies another allocation |
+| Same project/language, unrelated dataset or incompatible object version/runtime | Use a distinct worker when authorized/needed |
+| Multiple existing workers appear to hold the requested object | Inspect provenance, derived state and availability; select an existing worker or ask if ambiguous, without starting another duplicate or stopping existing workers |
+| Old session has an analysis-specific name but confirmed matching object provenance | Reuse safely across questions and document its object bindings; preserve its live registry and interpreter |
 | Explicit short test request | Keep it short; the 72-hour production preference does not apply |

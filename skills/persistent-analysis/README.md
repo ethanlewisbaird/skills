@@ -40,21 +40,21 @@ export PERSISTENT_ANALYSIS_ROOT=/shared/private/location/persistent-analysis
 persistent-analysis list
 ```
 
-Or supply `--root PATH` on each command. Use `--session NAME` explicitly; `PERSISTENT_ANALYSIS_SESSION` is an optional default. A session records one language and project working directory; its documented scope must also identify the dataset/object provenance and analysis. Reuse requires all of these to match, not merely the project and language. Multiple dataset/analysis/language sessions can coexist. Do not pool unrelated R work or unrelated Python work into one global interpreter. Session names are unique generations and cannot be reused, even after a crash. `list`/`status` never start jobs or load data.
+Or supply `--root PATH` on each command. Use `--session NAME` explicitly; `PERSISTENT_ANALYSIS_SESSION` is an optional default. A session records one language and project working directory. Select it by dataset/integration-object provenance and compatible runtime, following [the interpreter-selection sequence](SKILL.md#select-the-interpreter-before-loading). Its recorded directory is the execution base, not a restriction to one analysis question; scripts in other analysis directories can use explicit paths. Session names are unique generations and cannot be reused, even after a crash. `list`/`status` never start jobs or load data.
 
 The agent must be allowed to write both the selected registry and the analysis project. Even `objects` submits a queued request. In a sandboxed Codex CLI session, explicitly allow the chosen registry with `--add-dir /shared/private/registry` (or the corresponding host permission). Read-only access can inspect status, but cannot execute or inspect R/Python objects through the queue. Do not bypass sandbox permissions.
 
 ## Session names and scope
 
-Use concise, descriptive names such as `<project>-<dataset>-<analysis>-r` or `...-python`. For example:
+Use concise, descriptive names such as `<project>-<dataset-or-integration-object>-r` or `...-python`. For example:
 
-- `project-may-joint-exploration-r`
-- `project-may-subset-de-r`
-- `project-reference-qc-python`
+- `scentinel-sep25-mar26-integrated-r`
+- `scentinel-may26-joint-r`
+- `project-reference-python`
 
-Each is a distinct workspace for one dataset/analysis/language scope. A logical dataset can contain multiple samples and related derived objects; it does not require one session per biological sample or one per figure. Follow-up plots and cosmetic revisions reuse the matching scope. If it is unclear whether a new request belongs to the same analysis, ask rather than combine workspaces or start needless duplicate workers.
+One dataset or integration object is shared across its analyses. For example, cell-state analysis, iCLIP overlap and neuronal summaries of the same integration object use the same R worker, retaining useful subsets and derived variables there. Selection and exceptions are detailed in [session planning](references/session-planning.md#datasetobject-identity-comes-first).
 
-Names are labels, not evidence of object identity. Record the dataset/source version, analysis purpose, important object bindings, session name and registry path in the existing project session note. The CLI currently stores project/language and initializer provenance; dataset/analysis scope is recorded in that note and checked by the agent, not mechanically enforced by new CLI metadata fields. Do not rename/move a live registry, restart its interpreter or copy large objects solely to improve a label. Existing workers can retain their old names while their intended scope is clarified.
+Names are labels, not evidence of object identity. Record the dataset/source version, important object bindings, session name and registry path in the existing project session note. The CLI currently stores project/language and initializer provenance; dataset/object bindings are documented in that note and checked by the agent, not mechanically enforced by new CLI metadata fields. Existing workers can retain analysis-specific names while serving other questions about the same object. Preserve their live registry paths, interpreters and loaded state.
 
 ## Attach a session you started manually
 

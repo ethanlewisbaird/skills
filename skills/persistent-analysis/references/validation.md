@@ -30,7 +30,13 @@ null-device label; correcting that assertion required no example-code change.
 Temporary fixture files were removed. Source was baseline `142bd6c` plus the
 uncommitted writing-guidance revision recorded by the enclosing Git commit.
 
-## Dataset/analysis/language session scope
+## Dataset/object session reuse — 2026-11-06
+
+Ethan clarified that the persistence boundary is the dataset or integration object, shared across research questions. This supersedes the analysis-specific scope guidance below. Updated the selection step, planning cases and README examples so cell states, iCLIP overlap, neuronal summaries, related subsets and plots reuse the loaded object in one compatible worker. Different directories or a busy queue do not alone justify another object load. Unrelated datasets, incompatible object versions/runtimes and authorized heavy independent workloads remain valid separation cases.
+
+This is a documentation-only correction. Structural validation, relative Markdown links/anchors, Git whitespace checks and source/installed-document parity passed. Manual instruction review covered a new question using the same integration, a busy matching worker, unrelated data, incompatible runtime, ambiguous duplicate workers and preserving existing analysis-specific worker names. No independent-agent behavioral evaluation, new allocation, object load, runtime-code replacement or session shutdown was performed.
+
+## Historical dataset/analysis/language session scope (superseded 2026-11-06)
 
 Clarified that workspace selection must match dataset/object provenance and analysis scope as well as project/language. Naming guidance now includes dataset, analysis and R/Python, with distinct workspaces for unrelated scopes and reuse for related plot revisions. Existing worker labels are not interpreted as global language hubs. Live registry paths, jobs, interpreters and objects were not renamed or modified.
 
