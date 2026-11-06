@@ -20,6 +20,8 @@ Choose the primary mapping policy for biological reasons before examining the de
 
 Use a broader supported mapping as a sensitivity analysis when useful. Count each source-species gene once within a signature. State whether the scoring unit is a gene, orthogroup or family, and how many-to-many assignments change its weight. Document legitimate paralogue families lost by a conservative map as well as expansion under a broader map.
 
+When the strict map removes important program genes, inspect ties and non-reciprocal best partners separately. Compare justified intermediate policies before choosing a primary map; many-to-one relationships can reflect genuine duplication. Keep relaxed-policy coverage distinct from evidence that paralogues have interchangeable function.
+
 Separate these stages for each signature and quantification:
 
 - Original signature entries and successfully resolved stable IDs.
@@ -49,6 +51,22 @@ python /resolved/skill/scripts/audit_coverage.py \
 ```
 
 The numeric support threshold above is an example for a compatible DIOPT table. Add `--min-genes` and `--min-fraction` together only when an analysis-specific score gate has been defined. The helper records input/script hashes, arguments, environment and any Slurm job ID in its run JSON; it never loads expression matrices or downloads references.
+
+The CLI also writes `mapping_family_diagnostics.tsv`, `signature_overlap.tsv` and
+`mapping_warnings.tsv`. Review warnings flag large broader-map components or
+signature pairs sharing many expressed experimental-species genes. Configure
+`--max-component-genes`, `--overlap-fraction` and `--min-shared-genes` for the task;
+their defaults are review heuristics, not biological cutoffs. Warnings leave mapping
+and coverage unchanged. Import `diagnose(mapping_rows, gene_audit, ...)` when using
+the helper inside an existing analysis; an optional `assay` column keeps assays separate.
+
+Candidate mapping components are calculated over the full supplied mapping graph,
+so weak links can chain multiple families together. Inspect large components and
+their out-of-signature partners before pooling expression; use curated evolutionary
+orthogroups when that is the intended unit. For overlapping signatures, inspect the
+shared genes and their functions before interpreting distinct biological processes.
+High overlap can reflect generic machinery, and pathway membership alone does not
+specify the direction of an activation response.
 
 Run `python scripts/test_audit_coverage.py` from this skill directory for the synthetic checks.
 

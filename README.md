@@ -82,12 +82,15 @@ Never store patient/sample identifiers, secrets, confidential data excerpts, or 
 
 ## Validation and compatibility
 
-`orthologue-coverage` passed skill validation and eight synthetic Python checks on
+`orthologue-coverage` passed skill validation and twelve synthetic Python checks on
 2026-11-06. These cover global partner selection, ties, measurement stages,
-row-order invariance, alias denominators, inconsistent-input rejection and CLI
-output. Its helper also reproduced all 36 coverage rows from the fly glioma pilot
-across two mapping policies and two quantifications. This validates the mapping
-and counting implementation, rather than biological conservation or a disease classifier.
+row-order invariance, alias denominators, inconsistent-input rejection, CLI output,
+component chaining, overlap thresholds and assay separation. Its helper reproduced
+all 36 original fly glioma coverage rows; the warning extension additionally matched
+the existing 20 family and 90 pathway-overlap diagnostics. Warnings flag large
+candidate mapping components and shared expressed genes for review without changing
+mapping or coverage. This validates the implementation, rather than biological
+conservation or a disease classifier.
 Run `python skills/orthologue-coverage/scripts/test_audit_coverage.py` for the
 portable synthetic checks; the pilot data are not bundled with the skill.
 
