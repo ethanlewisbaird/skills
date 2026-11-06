@@ -10,6 +10,7 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [persistent-analysis](skills/persistent-analysis/SKILL.md) | Reuse loaded R/Seurat and Python interpreters across tasks/conversations through private Slurm queues; supports existing manual sessions and new tmux/screen workers. |
 | [seurat-qc-clustering](skills/scRNAseq/seurat-qc-clustering/SKILL.md) | Interactive Seurat QC and clustering: flexible inputs/metadata, dataset-specific QC, capture-aware doublets, diagnostic plots, user-selected sweeps and checkpoint resume in persistent R. |
 | [single-cell-plot-style](skills/scRNAseq/single-cell-plot-style/SKILL.md) | Ethan's default feature/module-map palette, shared feature limits, and white-to-forest-green expression dotplots on a 0–2.5 colour scale. Includes reusable R plot components. |
+| [single-cell-differential-expression](skills/scRNAseq/single-cell-differential-expression/SKILL.md) | Within-state condition contrasts: exploratory Seurat screens, raw-count pseudobulks, sample/design gates and replicated edgeR QL tests. |
 
 The scRNA-seq collection is under `skills/scRNAseq/`. Install the complete
 `seurat-qc-clustering` subfolder using the discovery paths below. This skill requires R/Seurat,
@@ -85,6 +86,14 @@ Never store patient/sample identifiers, secrets, confidential data excerpts, or 
 colorRamps 2.3.4): shared feature-colour mappings across different panel ranges,
 retained negative scores, dotplot endpoint saturation, explicit palette overrides,
 and 300 dpi JPEG export. These checks did not load scientific analysis objects.
+
+`single-cell-differential-expression` passed skill validation and 19 synthetic R
+checks on 2026-11-06 in Slurm job 40677. Checks cover aggregation/metadata alignment,
+replication and confounding gates, paired designs, QL effect direction and BH FDR,
+Seurat detection filtering/Bonferroni values and unchanged input objects. See its
+[validation record](skills/scRNAseq/single-cell-differential-expression/references/validation.md)
+for versions, command, source hashes and task logs. It selects methods from the
+experimental design; it does not turn cell partitions into biological replicates.
 
 Run the isolated helper tests on Linux:
 

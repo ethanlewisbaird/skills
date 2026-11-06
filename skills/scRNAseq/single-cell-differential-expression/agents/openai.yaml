@@ -1,0 +1,3 @@
+interface:
+  display_name: "Single-cell Differential Expression"
+  short_description: "Replication-aware within-state expression comparisons"
