@@ -18,6 +18,16 @@ Pin orthology and identifier dictionaries by release, URL and checksum. Prefer s
 
 Choose the primary mapping policy for biological reasons before examining the desired expression result. Trusted annotated one-to-one relationships and unique reciprocal score-best pairs are different definitions: name the one actually used. A score-best pair is not proof of evolutionary one-to-one orthology. Compute score-best partners globally over the supplied species-wide mapping, before restricting to a signature or expression subset. Retain ties as ambiguity rather than choosing by row order or expression.
 
+Resolve what “high confidence” means before filtering. A numeric DIOPT support
+cutoff counts supporting prediction methods; the formal DIOPT confidence rank
+also uses forward/reverse best-match status. Check the relevant release's
+[rank definitions](https://www.flyrnai.org/DIOPT_help.html#versions) and name the
+criterion actually applied. For a user-selected numeric cutoff, retain **every**
+qualifying pair, including tied and non-top candidates; apply ranking restrictions
+only when requested. Compare plausible cutoffs for coverage and family expansion
+when the cutoff is unsettled. A cutoff such as six from one fly–human analysis is
+not a universal default or a calibrated false-discovery threshold.
+
 Use a broader supported mapping as a sensitivity analysis when useful. Count each source-species gene once within a signature. State whether the scoring unit is a gene, orthogroup or family, and how many-to-many assignments change its weight. Document legitimate paralogue families lost by a conservative map as well as expansion under a broader map.
 
 When the strict map removes important program genes, inspect ties and non-reciprocal best partners separately. Compare justified intermediate policies before choosing a primary map; many-to-one relationships can reflect genuine duplication. Keep relaxed-policy coverage distinct from evidence that paralogues have interchangeable function.
@@ -43,6 +53,13 @@ Use `scripts/audit_coverage.py` after preparing these UTF-8 TSVs:
 | Features | `source_id`, `assayed`, `expressed` | Experimental-species IDs and TRUE/FALSE eligibility; expressed implies assayed. |
 
 Here `source` means the experimental species and `target` the signature species. Pass an explicitly justified `--min-score`. The helper compares unique reciprocal score-best mapping with all supplied pairs above that threshold. For other mapping definitions, adapt the analysis rather than relabeling this helper's output.
+
+The helper's `primary` and `broader` output keys identify its strict and
+all-supported methods; they do not dictate the scientific primary analysis.
+When the chosen policy is all pairs above a support cutoff, use the `broader`
+rows as the all-supported primary mapping and label that role and cutoff clearly.
+Retain the strict rows only for an intended sensitivity comparison. Verify that
+the selected pair set exactly equals all input pairs at or above the cutoff.
 
 ```bash
 python /resolved/skill/scripts/audit_coverage.py \
