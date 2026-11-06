@@ -1,0 +1,4 @@
+interface:
+  display_name: "Orthologue mapping and coverage"
+  short_description: "Audit cross-species mappings and signature coverage"
+  default_prompt: "Use $orthologue-coverage to audit mapping ambiguity and gene coverage before interpreting a cross-species signature."

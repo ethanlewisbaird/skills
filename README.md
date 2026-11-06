@@ -11,6 +11,7 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [seurat-qc-clustering](skills/scRNAseq/seurat-qc-clustering/SKILL.md) | Interactive Seurat QC and clustering: flexible inputs/metadata, dataset-specific QC, capture-aware doublets, diagnostic plots, user-selected sweeps and checkpoint resume in persistent R. |
 | [single-cell-plot-style](skills/scRNAseq/single-cell-plot-style/SKILL.md) | Ethan's default feature/module-map palette, shared feature limits, and white-to-forest-green expression dotplots on a 0–2.5 colour scale. Includes reusable R plot components. |
 | [single-cell-differential-expression](skills/scRNAseq/single-cell-differential-expression/SKILL.md) | Within-state condition contrasts: exploratory Seurat screens, raw-count pseudobulks, sample/design gates and replicated edgeR QL tests. |
+| [orthologue-coverage](skills/orthologue-coverage/SKILL.md) | Cross-species signature feasibility: stable-ID resolution, reciprocal score-best versus broader mapping, paralogue ambiguity and assayed/expressed coverage. Includes a metadata-only audit helper. |
 
 The scRNA-seq collection is under `skills/scRNAseq/`. Install the complete
 `seurat-qc-clustering` subfolder using the discovery paths below. This skill requires R/Seurat,
@@ -80,6 +81,15 @@ Replace `inspect` with `export`, `validate`, `disable`, `enable`, or `erase` as 
 Never store patient/sample identifiers, secrets, confidential data excerpts, or raw learner answers. Store only sanitized conceptual evidence outside repositories. The `--sanitized` flag is the caller's assertion, not a privacy detector. Learning records are not included in this repository.
 
 ## Validation and compatibility
+
+`orthologue-coverage` passed skill validation and eight synthetic Python checks on
+2026-11-06. These cover global partner selection, ties, measurement stages,
+row-order invariance, alias denominators, inconsistent-input rejection and CLI
+output. Its helper also reproduced all 36 coverage rows from the fly glioma pilot
+across two mapping policies and two quantifications. This validates the mapping
+and counting implementation, rather than biological conservation or a disease classifier.
+Run `python skills/orthologue-coverage/scripts/test_audit_coverage.py` for the
+portable synthetic checks; the pilot data are not bundled with the skill.
 
 `single-cell-plot-style` passed skill validation and synthetic R checks on
 2026-11-05 (Slurm job 40501; R 4.4.2, ggplot2 4.0.2, scales 1.4.0,
