@@ -12,6 +12,7 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [single-cell-plot-style](skills/scRNAseq/single-cell-plot-style/SKILL.md) | Ethan's default feature/module-map palette, shared feature limits, and white-to-forest-green expression dotplots on a 0–2.5 colour scale. Includes reusable R plot components. |
 | [single-cell-differential-expression](skills/scRNAseq/single-cell-differential-expression/SKILL.md) | Within-state condition contrasts: exploratory Seurat screens, raw-count pseudobulks, sample/design gates and replicated edgeR QL tests. |
 | [orthologue-coverage](skills/orthologue-coverage/SKILL.md) | Cross-species signature feasibility: stable-ID resolution, reciprocal score-best versus broader mapping, paralogue ambiguity and assayed/expressed coverage. Includes a metadata-only audit helper. |
+| [scientific-report-writing](skills/scientific-report-writing/SKILL.md) | Reader-facing scientific narratives organized around research questions and selected evidence, with technical provenance maintained separately. |
 
 The scRNA-seq collection is under `skills/scRNAseq/`. Install the complete
 `seurat-qc-clustering` subfolder using the discovery paths below. This skill requires R/Seurat,
@@ -30,6 +31,13 @@ dotplots, not enrichment results or module-score maps.
 The mentor defaults to **Balanced**: autonomous routine execution, concise explanations, and occasional focused questions at major milestones. Other modes are Intensive learning, Assessment first, Autonomous research, and Review session. Say **“Mentoring off for this session”** to disable teaching and learning-record use. Scientific validity warnings remain active.
 
 ## Install
+
+`scientific-report-writing` supports report drafting, narrative restructuring and
+evidence selection from existing analyses. Its default is a continuous scientific
+story with study-oriented headings, without personal credits or technical
+appendices. Explicit audience requirements take precedence. It updates the
+maintained generator and keeps scientific uncertainty visible while preserving
+the detailed methods and execution history in existing technical records.
 
 Clone this repository to a location you control, then copy or symlink the **whole skill folder**, including its references and scripts, into your agent's discovery directory. The examples below assume the clone is at `$HOME/skills`; choose a different clone location if that directory already exists. They do not overwrite an existing installed skill.
 
