@@ -12,7 +12,33 @@ Determine which parts of a reference-species signature are measurable in the exp
 
 Identify both species, genome/annotation releases, feature identifiers, signature provenance and the intended comparison. Inspect existing analysis code and reuse its accepted metadata. When expression objects are needed on Ethan's HPC, use `persistent-analysis` to verify and reuse the correct Slurm interpreter; extract compact feature/eligibility tables there. The bundled helper itself reads only small metadata tables.
 
-Pin orthology and identifier dictionaries by release, URL and checksum. Prefer stable IDs for joins. Resolve symbols to approved identifiers, then unique previous symbols or aliases; keep ambiguous/unresolved entries visible. Parse the actual file format, including quoted alias fields, metadata headers and report footers. Distinguish a downloaded release from a claimed underlying algorithm version. Verify original signature membership where possible; retain an explicit provenance limitation otherwise.
+Pin orthology and identifier dictionaries by release, URL and checksum. Prefer stable IDs for joins. Parse the actual file format, including quoted alias fields, metadata headers and report footers. Distinguish a downloaded release from a claimed underlying algorithm version. Verify original signature membership where possible; retain an explicit provenance limitation otherwise.
+
+## Audit identifier namespaces before mapping
+
+Inspect the complete feature-ID vector before selecting a resolver. A matrix can
+mix numeric IDs and symbols even when its first rows are entirely numeric.
+Count candidate namespaces and inspect examples from each; establish their meaning
+from provider metadata. Numeric strings alone do not establish an Entrez namespace.
+Use the small ID vector or an identifier-only export from the persistent worker
+when the expression object is large.
+
+Resolve each documented namespace against the appropriate pinned dictionary.
+For human symbols, prefer approved names, then unique previous names, then unique
+aliases. Keep ambiguous and unresolved matches visible. Preserve original IDs and
+row positions, resolved stable IDs, resolution method and dictionary release;
+document case changes or version-suffix removal. Avoid numeric coercion that
+changes identifier strings. Flag multiple input rows resolving to one stable ID
+separately from ambiguous input-to-ID matches; use an explicit aggregation or
+exclusion policy rather than choosing a row by position or expression.
+
+Check retention after identifier resolution separately from orthologue selection,
+measurement and expression filtering. Verify representative known identifiers and
+whether the retained dimensions are plausible for this input. Diagnose an
+unexpected collapse before scoring; successful parsing does not validate the gene
+universe. Set any retention gate from the dataset's scope rather than carrying a
+whole-transcriptome threshold into a small panel. Record namespace counts,
+resolution outcomes, duplicate handling and exclusions in the existing gene audit.
 
 ## Define mapping and measurement
 
