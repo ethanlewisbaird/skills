@@ -88,6 +88,11 @@ the relevant stage, including concrete API examples and stage-specific checks.
   embeddings for resolution comparisons. **Pause after the comparison** for Ethan's
   final PC/resolution/layout choice unless explicitly delegated. A prior setting is
   a provisional reference, not approval of a new result. Record the choice and seed.
+- **Unexpected sample separation.** When separation changes after QC or relative to
+  an earlier analysis, follow the [sample-separation diagnostic](references/scientific_decisions.md#unexpected-sample-separation).
+  Separate cell-removal effects from model refitting and verify whether earlier
+  coordinates were integrated before attributing the change to filtering, depth or
+  biology. Neighbour mixing is diagnostic evidence, not a target for choosing a model.
 - **Curate using evidence.** Removing/merging clusters or applying marker gates is
   dataset dependent. Bind decisions to the current `partition_id`, use named
   mappings, preserve prior labels, and document reasons. Never transfer a numeric

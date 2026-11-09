@@ -153,6 +153,88 @@ labels are retained as `clusters_before_reanalysis` when present. It does not re
 data. Sources: [SCT](https://satijalab.org/seurat/articles/sctransform_vignette),
 [cell-cycle regression](https://satijalab.org/seurat/articles/cell_cycle_vignette).
 
+## Unexpected sample separation
+
+Use this diagnostic when sample separation changes after QC or differs from an
+earlier analysis. Reuse existing fits and coordinates in the persistent worker;
+keep diagnostic results separate from the accepted model and partition.
+
+### Separate cell removal from refitting
+
+Match unique stable cell IDs and sample/capture metadata explicitly. Use the same
+retained cells as queries throughout, with a common chosen PC count, distance
+metric and neighbour count. Distinguish the fitted model from the cells available
+as potential neighbours:
+
+| Comparison | PCA fit | Potential neighbours |
+|---|---|---|
+| A | Before QC | All original called cells |
+| B | Before QC, unchanged | Retained cells |
+| C | After QC | The same retained cells as B |
+
+A versus B measures the effect of removing potential neighbours in a fixed space.
+B versus C measures the effect of refitting on the retained population. Comparing
+only B and C cannot establish whether filtering created separation: both searches
+have already removed excluded cells. State whether filtering includes cell QC,
+doublet removal or both. If a fit is unavailable, report which comparison remains
+unresolved rather than silently substituting UMAP coordinates or reloading an
+unspecified large object.
+
+For each query cell, calculate the fraction of its k nearest neighbours from the
+same sample, then average within each query sample. Exclude self by stable cell ID,
+including when query and search matrices have different row orders; dropping the
+first neighbour alone is unsafe with tied coordinates. Use exact searches when
+feasible and record any approximation. Validate row/label alignment, valid neighbour
+indices, k and self exclusion; a few independent distance calculations can check
+the search and summary implementation.
+
+Export query counts, search-population counts, model/space, dimensions, distance
+metric, k, search settings and sample-level fractions. The sample-size reference
+for a query from sample s is `(N_s - 1) / (N - 1)`, using that comparison's search
+population containing the query. This is a random-mixing benchmark, not a null
+model controlling cell-type composition. Evaluate a bounded range of already
+chosen PCs when PC sensitivity matters; UMAP appearance alone is insufficient.
+
+### Establish what the historical map represents
+
+Inspect the generating code and accepted-result records: standalone versus
+reference-integrated coordinates, normalization/SCT flavor, pooled versus
+per-sample fitting, gene coverage and modeling features, regression, cell membership
+and PCA/UMAP settings. Groups defined from one dataset can still be displayed on
+coordinates integrated with another; a "dataset-only" grouping label does not
+establish a standalone embedding.
+
+For a display comparison, show the same matched cells on each existing map and
+state which population was used to fit each map. Shared displayed cells control
+membership in the figure, not model construction. Treat neighbour fractions from
+historical 2D UMAPs as a separate descriptive measure from PCA-space mixing.
+Different spaces, rotations or fitted populations do not isolate integration's
+effect or make distances between panels comparable.
+
+### Investigate expression drivers before interpreting the difference
+
+Inspect sample-associated PCs, their gene loadings and their relationships with
+original count-based QC metrics. Map candidate genes/programs on common coordinates
+with the applicable expression-plot style. Associations with depth, mitochondria,
+ribosomal fraction or heat-shock genes suggest hypotheses; none alone establishes
+a technical artifact. When depth is proposed as the explanation, assess comparable
+RNA-count ranges and cell states where feasible rather than relying only on pooled
+correlations or sample-wide detection rates.
+
+For a targeted feature-policy sensitivity, hold cells and normalized residuals
+fixed while changing only the genes entering PCA. Use verified dataset-specific
+gene annotations and export excluded-feature membership. This tests direct PCA
+feature contributions; it does not reproduce refitting normalization after count
+feature removal, regression or integration. Isolate other consequential processing
+differences separately when needed rather than changing several settings together.
+
+Interpret mixing alongside cell-state composition, marker coherence and experimental
+design. A condition represented by one sample/capture cannot be separated from its
+sample/preparation effect through embedding structure alone. Greater mixing is not
+evidence of a better model and does not justify automatically regressing sample
+labels, integrating, excluding genes or changing accepted filters. Preserve the
+partition-selection milestone while a consequential interpretation remains open.
+
 ## Clustering, markers and dataset-specific curation
 
 ### Interactive milestones and restored diagnostic figures
