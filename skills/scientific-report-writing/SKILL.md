@@ -22,6 +22,16 @@ Use the existing question-level report and its generator. Preserve technical
 history in the project's existing records; removing a plot from the narrative
 does not reject its experiment or authorize deleting its results.
 
+Default to a maximum of 3,000 words and eight figures or tables combined for the
+whole maintained report. Count narrative, captions and table text toward the word
+limit; exclude references. Count each independently interpreted plot panel as a
+separate display, including panels within a composite figure. These are ceilings,
+not targets. Integrate new results by replacing or condensing older material
+within the same budget. For a narrowly scoped edit to an existing oversized
+report, flag the excess rather than silently rewriting unrelated sections.
+Preserve essential evidence and uncertainty; ask for an exception if they cannot
+fit. Explicit user-specified limits take precedence.
+
 ## Build the scientific story
 
 Lead with the question and the current evidence-based answer. Order the body by
@@ -95,6 +105,8 @@ execution logs and routine artifact checks in the existing technical records.
 
 Deliver the updated generator and rendered report. Check local/fragment links,
 embedded assets and any newly created figures. State the scope of visual review
-accurately when browser rendering is unavailable. Completion means the report
+accurately when browser rendering is unavailable. Check the rendered report's
+word and display counts against the applicable limits and report any agreed
+exception. Completion means the report
 matches the agreed presentation and scientific evidence, with reproducibility
 still available in its appropriate project location.
