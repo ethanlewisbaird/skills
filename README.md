@@ -37,7 +37,11 @@ evidence selection from existing analyses. Its default is a continuous scientifi
 story with study-oriented headings, without personal credits or technical
 appendices. Explicit audience requirements take precedence. It updates the
 maintained generator and keeps scientific uncertainty visible while preserving
-the detailed methods and execution history in existing technical records.
+the detailed methods and execution history in existing technical records. Main
+claims are tied to supporting evidence and alternative explanations; new results
+are integrated into the current argument. Captions identify the comparison,
+experimental unit and takeaway, and validation findings that affect scientific
+confidence remain in the narrative.
 
 Clone this repository to a location you control, then copy or symlink the **whole skill folder**, including its references and scripts, into your agent's discovery directory. The examples below assume the clone is at `$HOME/skills`; choose a different clone location if that directory already exists. They do not overwrite an existing installed skill.
 

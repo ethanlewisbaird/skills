@@ -30,6 +30,20 @@ and what remains unsettled. Let each section answer a scientific question or
 state a finding. Group related evidence together instead of repeating successive
 workflow stages or ending every new experiment with another complete recap.
 
+For each main claim, identify its supporting result, the uncertainty that limits
+it and plausible alternative explanations supported by the study context.
+Distinguish evidence that discriminates between explanations from evidence that
+is merely consistent with them. Match the strength of the conclusion to the
+design and results; keep unresolved explanations visible without inventing
+speculation or requiring additional analysis for every editorial task.
+
+When extending a report, integrate new evidence where it changes the argument.
+Revisit earlier claims, captions and the overall answer so the report expresses
+the current scientific position consistently. Explain meaningful changes in
+interpretation and retain the reason for superseded decisions in existing
+records. Update the parent narrative when a child report changes the broader
+conclusion; a link alone does not convey that change.
+
 Use study, condition or population names rather than people's names. Default to
 a title, short introduction and continuous narrative, without author credits,
 summary cards, heading navigation or dashboard decorations.
@@ -49,7 +63,13 @@ the interpretation. Multiple views can be useful when they answer distinct
 questions, such as reference identities versus newly defined groups. Explain
 separate numbering systems and preserve comparable coordinates/scales.
 
-Use captions to explain measurements, comparisons and interpretation limits.
+Use captions to identify the comparison, measured quantity and denominator,
+experimental unit and sample counts when available, and the main supported
+takeaway. Explain encodings or panel labels needed to read the figure and any
+interpretation limit material to that takeaway. Distinguish biological replicate
+counts from numbers of cells or technical observations; flag missing information
+instead of guessing. Keep captions focused on the figure's contribution rather
+than repeating the surrounding discussion.
 Keep plot styling consistent with applicable project rules and plotting skills.
 A display revision preserves the underlying summaries and transformations unless
 a scientific change is explicitly justified and recorded.
@@ -67,8 +87,11 @@ the story.
 Verify numerical statements against the retained results, check figure/label
 agreement, and confirm that requested removals stay absent on rerender. Update
 links from project documentation when technical sections move out of the report.
-Keep provenance and validation findings in the existing technical records rather
-than adding them back to the reader-facing narrative.
+Include validation findings that affect scientific confidence in the narrative,
+alongside the claims they qualify: for example, sample alignment, exclusions,
+confounding or sensitivity to analysis choices. State what was checked, what the
+result supports and any remaining limitation. Keep commands, software versions,
+execution logs and routine artifact checks in the existing technical records.
 
 Deliver the updated generator and rendered report. Check local/fragment links,
 embedded assets and any newly created figures. State the scope of visual review
