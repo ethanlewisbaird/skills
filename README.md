@@ -43,6 +43,12 @@ are integrated into the current argument. Captions identify the comparison,
 experimental unit and takeaway, and validation findings that affect scientific
 confidence remain in the narrative.
 
+For rendered HTML, its bundled standard-library checker verifies word/display
+budgets, figure captions and alternative text, local targets and HTML fragments,
+and unfinished template placeholders. Panel counts are explicit declarations
+verified by inspecting the figures; unannotated figures fail rather than default
+to one panel. See the skill's [HTML check guidance](skills/scientific-report-writing/references/html_checks.md).
+
 Clone this repository to a location you control, then copy or symlink the **whole skill folder**, including its references and scripts, into your agent's discovery directory. The examples below assume the clone is at `$HOME/skills`; choose a different clone location if that directory already exists. They do not overwrite an existing installed skill.
 
 ```bash
@@ -125,6 +131,18 @@ Run the isolated helper tests on Linux:
 ```bash
 python skills/bioinformatics-socratic-mentor/scripts/test_learning_record.py
 ```
+
+`scientific-report-writing` passed fourteen synthetic checker tests on 2026-11-12,
+including word/display boundaries, overrides, reference exclusions, composite
+counts, missing annotations/captions/alt text, local files and fragments,
+placeholder detection and read-only CLI exit/JSON behavior. A read-only check of
+the retained TCGA report passed at 1,492 words and two tables. This count excludes
+head metadata; the earlier conservative report count included its HTML title.
+The existing integration report correctly returned an incomplete display count
+for its missing figure annotation; this skill extension did not edit reports.
+Run `python skills/scientific-report-writing/scripts/test_check_report.py` to
+repeat the portable tests. The checker neither decodes raster images nor verifies
+scientific claims or browser layout; those remain separate checks.
 
 On an HPC, run resource-consuming checks through your scheduler. The skill can also be checked with Codex's official `skill-creator/scripts/quick_validate.py` when available.
 

@@ -103,10 +103,19 @@ confounding or sensitivity to analysis choices. State what was checked, what the
 result supports and any remaining limitation. Keep commands, software versions,
 execution logs and routine artifact checks in the existing technical records.
 
-Deliver the updated generator and rendered report. Check local/fragment links,
-embedded assets and any newly created figures. State the scope of visual review
-accurately when browser rendering is unavailable. Check the rendered report's
-word and display counts against the applicable limits and report any agreed
-exception. Completion means the report
+For rendered HTML, run [scripts/check_report.py](scripts/check_report.py) after
+editing the maintained generator. Read [references/html_checks.md](references/html_checks.md)
+for panel/reference annotations, commands and check coverage. Confirm panel
+counts by inspecting the figures; a missing annotation requires review rather
+than assuming one panel. Incorporate the result into the existing validation
+record and correct failures within the authorized scope. Use limit overrides
+only for an explicit user-specified limit or agreed exception. For other report
+formats, check equivalent counts and assets with their native tools.
+
+Deliver the updated generator and rendered report. Inspect selected figures and
+check any newly created ones. The mechanical checker does not verify scientific
+claims, image readability or browser layout; retain the numerical and visual
+checks above. State the scope of visual review accurately when browser rendering
+is unavailable, and report any agreed size exception. Completion means the report
 matches the agreed presentation and scientific evidence, with reproducibility
 still available in its appropriate project location.
