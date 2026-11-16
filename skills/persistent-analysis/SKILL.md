@@ -34,6 +34,8 @@ Use `--session NAME run analysis.R` (or `.py`) for a bounded wait, or `submit an
 
 Scripts execute sequentially in the chosen interpreter and project working directory. R expressions use `.GlobalEnv`; Python uses the attached user namespace. New variables persist. Join task-created background work before returning; fire-and-forget threads/futures would break sequential mutation assumptions.
 
+Keep plot-ready derived data before discarding a provisional model. Write its coordinates, assignments and sample/cluster metadata to the analysis directory (for example `tables/<comparison>_umap.csv`) and retain the object while the comparison is under review. A persistent worker avoids reloading inputs; it cannot recover a derived object that a script removed. Do not rerun a fitting or integration step only to recolour or replot a result.
+
 ## Verify outputs
 
 Follow the user's figure format, resolution and directory conventions. Open an explicit graphics device so R cannot create a default PDF. Close only devices/figures opened by the task, including on errors, using R tryCatch/finally or Python try/finally. Register existing generated files with `persistent_paths("relative/output.jpeg", "table.csv")`, using their actual paths. Read the returned files and verify the actual outputs; when an image-viewing tool is available, inspect figures for layout/labels before presenting them. Claim visual review only when performed. Large tables, arrays and diagnostics belong in files, not the response.
