@@ -59,9 +59,12 @@ gate, not evidence that a design has adequate power or valid sample independence
 Set detection, minimum library cells, expression filtering and effect-size
 thresholds explicitly from the analysis question or established project settings.
 The helper exposes these choices; this skill imposes no universal 5% detection
-cutoff, cluster count or gene universe. Use original RNA expression for DE rather
-than integrated reductions or imputed values. Inspect split Seurat layers; joining
-layers requires a deliberate local analysis object, not silent parent mutation.
+cutoff, cluster count or gene universe. Ethan approves the comparator, covariates,
+aggregation level, filters and correction family as one stage request before the
+model runs. An established project setting is a reference for that request, not
+standing approval. Use original RNA expression for DE rather than integrated
+reductions or imputed values. Inspect split Seurat layers; joining layers requires
+a deliberate local analysis object, not silent parent mutation.
 
 ## Results, plots and checks
 

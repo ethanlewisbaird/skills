@@ -42,7 +42,7 @@ resolution outcomes, duplicate handling and exclusions in the existing gene audi
 
 ## Define mapping and measurement
 
-Choose the primary mapping policy for biological reasons before examining the desired expression result. Trusted annotated one-to-one relationships and unique reciprocal score-best pairs are different definitions: name the one actually used. A score-best pair is not proof of evolutionary one-to-one orthology. Compute score-best partners globally over the supplied species-wide mapping, before restricting to a signature or expression subset. Retain ties as ambiguity rather than choosing by row order or expression.
+Choose the primary mapping policy for biological reasons before examining the desired expression result. Trusted annotated one-to-one relationships and unique reciprocal score-best pairs are different definitions: name the one actually used. A score-best pair is not proof of evolutionary one-to-one orthology. Compute score-best partners globally over the supplied species-wide mapping, before restricting to a signature or expression subset. Retain ties as ambiguity rather than choosing by row order or expression. Present the candidate policies and their coverage consequences to Ethan; he chooses the primary map before scoring.
 
 Resolve what “high confidence” means before filtering. A numeric DIOPT support
 cutoff counts supporting prediction methods; the formal DIOPT confidence rank
@@ -66,7 +66,7 @@ Separate these stages for each signature and quantification:
 - Orthologues satisfying the analysis-specific expression rule.
 - Distinct experimental-species genes and retained reference-signature fraction.
 
-Keep the original signature denominator explicit; report canonical-ID duplicates separately. If scores will be computed, choose minimum coverage and distinct-gene gates before looking at their patterns. Thresholds are operational choices requiring justification, not universal validity guarantees. In particular, ten genes/20% used in one exploratory pilot is not a default for other datasets.
+Keep the original signature denominator explicit; report canonical-ID duplicates separately. If scores will be computed, choose minimum coverage and distinct-gene gates before looking at their patterns. Thresholds are operational choices requiring justification, not universal validity guarantees. In particular, ten genes/20% used in one exploratory pilot is not a default for other datasets. Ethan approves the coverage and distinct-gene gates with the mapping policy, before any score exists.
 
 ## Optional deterministic helper
 
