@@ -333,9 +333,11 @@ qc_save_plot <- function(plot, path, width = 10, height = 7, dpi = 300L) {
 }
 
 qc_preview <- function(seu, out_dir, rules = list(), by = "sample_id", overrides = NULL,
-                       metrics = NULL, prefix = "qc_preview") {
+                       metrics = NULL, prefix = "qc_preview",
+                       plots = c("distributions", "counts_genes"), umap = FALSE) {
   qc_compute()
   qc_need("ggplot2")
+  plots <- match.arg(plots, c("distributions", "counts_genes"), several.ok = TRUE)
   result <- qc_evaluate(seu[[]], rules, by, overrides)
   if (is.null(metrics)) {
     candidates <- if (qc_info(seu)$expression_type == "counts") c("nCount_RNA", "nFeature_RNA", "percent.mt", "percent.ribo") else "nFeature_expression"
@@ -347,7 +349,7 @@ qc_preview <- function(seu, out_dir, rules = list(), by = "sample_id", overrides
   groups <- as.character(md[[by]])
   pages <- split(unique(groups), ceiling(seq_along(unique(groups)) / 6))
   files <- character()
-  for (page in seq_along(pages)) {
+  for (page in if ("distributions" %in% plots) seq_along(pages) else integer()) {
     ix <- groups %in% pages[[page]]
     long <- do.call(rbind, lapply(metrics, function(metric) data.frame(
       group = groups[ix], metric = metric, value = md[[metric]][ix])))
@@ -380,7 +382,7 @@ qc_preview <- function(seu, out_dir, rules = list(), by = "sample_id", overrides
     qc_save_plot(p, path, width = max(8, 3 * length(pages[[page]])), height = max(5, 2.5 * length(metrics)))
     files <- c(files, path)
   }
-  xmetric <- if ("nCount_RNA" %in% colnames(md)) "nCount_RNA" else NULL
+  xmetric <- if ("counts_genes" %in% plots && "nCount_RNA" %in% colnames(md)) "nCount_RNA" else NULL
   if (!is.null(xmetric)) {
     scatter <- data.frame(md, qc_pass = result$flags$pass, .group = groups, check.names = FALSE)
     for (page in seq_along(pages)) {
@@ -393,7 +395,7 @@ qc_preview <- function(seu, out_dir, rules = list(), by = "sample_id", overrides
       files <- c(files, path)
     }
   }
-  if ("umap" %in% names(seu@reductions)) {
+  if (isTRUE(umap) && "umap" %in% names(seu@reductions)) {
     temporary <- seu
     temporary$qc_preview_pass <- factor(result$flags$pass, levels = c(FALSE, TRUE))
     path <- file.path(out_dir, "figs", paste0(prefix, "_umap.jpeg"))
@@ -403,8 +405,6 @@ qc_preview <- function(seu, out_dir, rules = list(), by = "sample_id", overrides
   dir.create(file.path(out_dir, "tables"), recursive = TRUE, showWarnings = FALSE)
   utils::write.csv(result$summary, file.path(out_dir, "tables", paste0(prefix, "_retention.csv")), row.names = FALSE)
   utils::write.csv(result$bounds, file.path(out_dir, "tables", paste0(prefix, "_boundaries.csv")), row.names = FALSE)
-  files <- c(files, qc_plot_qc(md, out_dir, by = by, metrics = metrics,
-                               prefix = prefix, plots = c("violin", "density", "scatter_mt")))
   result$files <- files
   print(result$summary)
   result
@@ -463,7 +463,8 @@ qc_attach_doublets <- function(seu, results) {
 }
 
 qc_doublets <- function(seu, capture_column = "capture_id", seed = 1L, workers = 1L, dbr = NULL,
-                        dbr_per1k = NULL, dbr_sd = NULL, out_dir = NULL) {
+                        dbr_per1k = NULL, dbr_sd = NULL, out_dir = NULL,
+                        clusters = FALSE, score = "xgb") {
   qc_compute()
   qc_need(c("scDblFinder", "SingleCellExperiment", "BiocParallel"))
   x <- qc_counts(seu)
@@ -482,7 +483,7 @@ qc_doublets <- function(seu, capture_column = "capture_id", seed = 1L, workers =
   workers <- min(workers, length(unique(captures)))
   bp <- if (workers == 1L) BiocParallel::SerialParam(RNGseed = seed) else
     BiocParallel::MulticoreParam(workers = workers, RNGseed = seed)
-  args <- list(sce = sce, samples = captures, clusters = FALSE, BPPARAM = bp)
+  args <- list(sce = sce, samples = captures, clusters = clusters, score = score, BPPARAM = bp)
   if (!is.null(dbr)) args$dbr <- dbr
   if (!is.null(dbr_per1k)) args$dbr.per1k <- dbr_per1k
   if (!is.null(dbr_sd)) args$dbr.sd <- dbr_sd
@@ -491,6 +492,16 @@ qc_doublets <- function(seu, capture_column = "capture_id", seed = 1L, workers =
   calls <- data.frame(cell_id = colnames(result), scDblFinder.class = as.character(result$scDblFinder.class),
                        scDblFinder.score = result$scDblFinder.score)
   seu <- qc_attach_doublets(seu, calls)
+  called_fraction <- mean(calls$scDblFinder.class == "doublet")
+  threshold <- unname(S4Vectors::metadata(result)$scDblFinder.threshold)
+  if (!is.null(dbr) && length(dbr) == 1L && !is.na(dbr)) {
+    upper <- min(1, dbr + (if (is.null(dbr_sd)) 0 else dbr_sd))
+    if (called_fraction > upper + 0.005) {
+      warning(sprintf(paste0("Called fraction %.3f exceeds the expected-rate band (upper %.3f). ",
+                             "Do not remove these cells without a second fit or an explicit review rationale."),
+                      called_fraction, upper), call. = FALSE)
+    }
+  }
   if (!is.null(out_dir)) {
     dir.create(file.path(out_dir, "tables"), recursive = TRUE, showWarnings = FALSE)
     utils::write.csv(data.frame(calls, capture_id = captures[match(calls$cell_id, colnames(seu))]),
@@ -502,20 +513,29 @@ qc_doublets <- function(seu, capture_column = "capture_id", seed = 1L, workers =
   }
   qc_history(seu, "doublet_detection", list(capture_column = capture_column, captures = table(captures),
                                            seed = seed, workers = workers, dbr = dbr,
-                                           dbr_per1k = dbr_per1k, dbr_sd = dbr_sd))
+                                           dbr_per1k = dbr_per1k, dbr_sd = dbr_sd,
+                                           clusters = clusters, score = score,
+                                           threshold = threshold,
+                                           called_fraction = called_fraction))
 }
 
-qc_remove_doublets <- function(seu, reason) {
+qc_remove_doublets <- function(seu, reason, class_column = "scDblFinder.class") {
   qc_compute()
-  if (!nzchar(reason) || is.null(seu$scDblFinder.class) || anyNA(seu$scDblFinder.class)) stop("Review complete doublet calls and record the removal rationale.")
-  if (!any(seu$scDblFinder.class == "singlet")) stop("No singlets remain.")
-  counts <- table(seu$scDblFinder.class)
-  seu <- subset(seu, cells = colnames(seu)[seu$scDblFinder.class == "singlet"])
+  if (!nzchar(reason)) stop("Review complete doublet calls and record the removal rationale.")
+  if (!class_column %in% names(seu[[]])) stop("Missing doublet class column: ", class_column)
+  calls <- seu[[]][[class_column]]
+  if (anyNA(calls) || any(!calls %in% c("singlet", "doublet"))) {
+    stop("Doublet calls must be complete singlet/doublet labels.")
+  }
+  if (!any(calls == "singlet")) stop("No singlets remain.")
+  counts <- table(calls)
+  seu <- subset(seu, cells = colnames(seu)[calls == "singlet"])
   if ("doublet" %in% names(counts) && counts[["doublet"]] > 0) {
     seu@misc$qc_clustering$partition_id <- NULL
     seu@misc$qc_clustering$model_current <- FALSE
   }
-  qc_history(seu, "remove_doublets", list(rationale = reason, calls = counts))
+  qc_history(seu, "remove_doublets", list(rationale = reason, calls = counts,
+                                         class_column = class_column))
 }
 
 qc_prepare <- function(seu, method, npcs = 50L, nfeatures = 3000L, vst_flavor = NULL,
@@ -737,7 +757,7 @@ qc_metadata <- function(data, by = "sample_id", metrics = NULL) {
 
 # Identical plot families and reference axes support honest before/after comparison.
 qc_plot_qc <- function(data, out_dir, by = "sample_id", metrics = NULL, prefix = "qc",
-                        reference = NULL, plots = c("violin", "distributions", "density", "scatter", "scatter_mt")) {
+                        reference = NULL, plots = c("violin", "scatter_mt")) {
   qc_compute()
   qc_need("ggplot2")
   md <- qc_metadata(data, by, metrics)
@@ -801,16 +821,20 @@ qc_plot_qc <- function(data, out_dir, by = "sample_id", metrics = NULL, prefix =
 }
 
 qc_plot_qc_comparison <- function(before, after, out_dir, by = "sample_id", metrics = NULL,
-                                   prefix = "qc", labels = c("Before QC", "After QC")) {
+                                   prefix = "qc", labels = c("Before QC", "After QC"),
+                                   plots = "paired") {
   qc_compute()
+  plots <- match.arg(plots, c("paired", "all"))
   if (length(labels) != 2L || anyDuplicated(labels)) stop("Provide distinct before/after stage labels.")
   before <- qc_metadata(before, by, metrics)
   metrics <- setdiff(names(before), by)
   after <- qc_metadata(after, by, metrics)
   if (!all(rownames(after) %in% rownames(before))) stop("After-QC cells must be a subset of before-QC cells.")
   reference <- rbind(before, after)
-  files <- c(qc_plot_qc(before, out_dir, by, metrics, paste0(prefix, "_before"), reference),
-             qc_plot_qc(after, out_dir, by, metrics, paste0(prefix, "_after"), reference))
+  files <- if (plots == "all") c(
+    qc_plot_qc(before, out_dir, by, metrics, paste0(prefix, "_before"), reference),
+    qc_plot_qc(after, out_dir, by, metrics, paste0(prefix, "_after"), reference)
+  ) else character()
   long <- do.call(rbind, lapply(seq_along(labels), function(i) {
     d <- if (i == 1) before else after
     do.call(rbind, lapply(metrics, function(metric) data.frame(group = d[[by]], metric = metric,

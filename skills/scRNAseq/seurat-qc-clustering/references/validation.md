@@ -103,3 +103,32 @@ before the collection-folder rename, including R's space-encoded script-path han
 validation passed as job `40454`. The tests no longer source a pipeline entrypoint,
 and the run record resolves its Git root from the skill location. Existing validation
 records remain historical evidence; generated figures/logs are excluded from Git.
+
+## Output-budget and doublet-review revision, 2026-11-16
+
+A real-data review of the May 2026 OCM QC run found 74 figures and 64 tables for a
+single QC question, and doublet calls at 11.4% against a documented 8.1% chemistry
+prior. Both the artifact volume and the call-rate behaviour were addressed at the
+helper and guidance level; no research object was modified by the skill change.
+
+- `qc_preview()` now saves one distributions figure and one count/feature scatter,
+  plus retention and boundary tables. The pass/fail UMAP requires `umap = TRUE`;
+  the duplicate internal violin/density/scatter-family call was removed.
+- `qc_plot_qc()` defaults to violin and mitochondrial scatter; histogram, density
+  and count/gene families are opt-in. `qc_plot_qc_comparison()` writes only the
+  paired before/after figure unless `plots = "all"`.
+- `qc_doublets()` gained `clusters` and `score` arguments, records the fitted
+  threshold and called fraction, and warns when the fraction exceeds `dbr + dbr.sd`.
+  `qc_remove_doublets(class_column = ...)` supports removal from an explicit
+  consensus/reviewer column.
+- SKILL.md and the reference documents now require one decision-focused preview and
+  comparison per stage, core tables only, deletion of superseded candidate-policy
+  artifacts, and an independent second fit before removal when the call rate exceeds
+  the expected band.
+
+Functional workflow job `46011` (partition fast, 2 CPUs, 8G) passed all synthetic
+tests with R 4.4.2, Seurat 5.3.0 and scDblFinder 1.20.2, including the reduced
+default preview outputs, the opt-in UMAP, the paired-only comparison, the
+cluster-based doublet fit and the updated test expectations. The run record is
+`logs/validation_record.R`; generated fixtures were removed. This validates software
+behaviour, not the doublet policy or thresholds of any real dataset.

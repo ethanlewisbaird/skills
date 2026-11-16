@@ -42,12 +42,14 @@ package version, inspect the installed help and current authoritative documentat
 Read [scientific decisions and execution](references/scientific_decisions.md) for
 the relevant stage, including concrete API examples and stage-specific checks.
 
-- **Preview first.** Import/adopt, calculate appropriate QC metrics, and save initial
-  distributions, violin plots, densities and count/gene/mitochondrial scatter plots
-  with no preset cutoffs. Preserve a small before-QC metadata snapshot; `qc_apply()`
-  saves `tables/qc_metrics_before.csv` when given `out_dir`. Repeat the same plot
-  families after cell QC and, separately, after doublet removal, with common axes
-  and explicit stage labels using `qc_plot_qc_comparison()`. Discuss evidence by sample/capture and the
+- **Preview first.** Import/adopt, calculate appropriate QC metrics, and save one
+  decision-focused distributions figure with any proposed boundaries plus a
+  count/feature scatter, with no preset cutoffs (`qc_preview()` does this by
+  default). Preserve a small before-QC metadata snapshot; `qc_apply()` saves
+  `tables/qc_metrics_before.csv` when given `out_dir`. After cell QC and, separately,
+  after doublet removal, save one paired before/after figure with common axes and
+  explicit stage labels using `qc_plot_qc_comparison()`. Request extra plot families
+  or a pass/fail UMAP only when a specific decision needs them. Discuss evidence by sample/capture and the
   analysis objective. MAD or fixed rules are candidates, not universal defaults.
   When cutoffs are proposed, call `qc_preview()` again. Inspect its JPEGs and
   retention table; iterate until the dataset-specific policy is settled. Apply the
@@ -63,8 +65,13 @@ the relevant stage, including concrete API examples and stage-specific checks.
   genotype, condition and biological replicate. Multiplexed biological samples can
   share a capture. Run `qc_doublets()` on documented original counts, generally after
   basic cell QC and before final normalization. Review scores and retention before
-  `qc_remove_doublets()`. Missing capture identity blocks this stage, not independent
-  QC inspection. Do not invent capture IDs or bypass a detection failure.
+  `qc_remove_doublets()`. Check the called fraction against the documented
+  expected-rate band. If it exceeds that band, or the scores show no separation,
+  refit with an independent configuration (`clusters = TRUE`, a different `score`,
+  or another caller) and remove only calls supported by both fits; keep
+  method-specific calls as flagged metadata. A low or high call rate is not evidence
+  that the calls are correct. Missing capture identity blocks this stage, not
+  independent QC inspection. Do not invent capture IDs or bypass a detection failure.
 - **Project-specific modeling.** Choose SCT versus log processing and explicitly pin
   SCT flavor. Cell-cycle scoring and regression follow the scientific aim: retaining
   biological state versus reducing cycle heterogeneity for cell-type analysis.
@@ -121,6 +128,14 @@ the relevant stage, including concrete API examples and stage-specific checks.
   in `tables/`, accepted/justified checkpoints in `objects/`, and maintained scripts
   in `code/`. Reuse its existing `analysis.html` and report generator; ask before
   creating an HTML when none exists. Do not generate a report for skill development.
+- Keep only decision-relevant artifacts. Core tables are the applied QC decisions,
+  one metrics snapshot per stage, retention summaries, doublet calls and run
+  records; core figures are one preview and one comparison per stage plus the
+  selected embedding/marker panels. Do not retain a separate plot family for every
+  metric at every stage. Delete figures and tables from superseded candidate
+  policies once the applied policy is recorded, after keeping the compact numerical
+  result in the narrative. Retain a rejected experiment only as the summary the
+  project standards require.
 - Save/resume checkpoints only at explicit, useful stages. `qc_checkpoint()` writes a
   Seurat RDS with provenance; `qc_resume()` loads only the identified checkpoint.
   Do not put `readRDS()` in repeatable plot scripts. Legacy RDS files can be read once

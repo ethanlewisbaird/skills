@@ -112,7 +112,9 @@ There is no automatic restart, checkpoint discovery, overwrite, or replay.
 
 `qc_preview()` returns rules, exact boundary semantics, optional per-group overrides,
 cell flags, retention, and the evaluated metadata. It does not filter/mutate the
-input. `qc_apply()` validates that the preview still matches the object before
+input. By default it saves one distributions figure with proposed boundaries and one
+count/feature scatter, plus retention and boundary tables; a pass/fail UMAP requires
+`umap = TRUE`. `qc_apply()` validates that the preview still matches the object before
 subsetting. Numeric `c(lower, upper)` rules include both endpoints. A rule list can
 set `lower_inclusive = FALSE` or `upper_inclusive = FALSE`. Missing/nonfinite metrics
 stop evaluation. A missing gene set is not a zero percentage.
@@ -128,8 +130,8 @@ Plotting APIs retain the interactive workflow:
 | Helper | Purpose |
 |---|---|
 | `qc_metadata()` | Lightweight cell-indexed QC snapshot for before/after plotting |
-| `qc_plot_qc()` | Violin, density, histogram and scatter families, paginated by group |
-| `qc_plot_qc_comparison()` | Matching before/after families with common axes and paired violins |
+| `qc_plot_qc()` | Violin and count/mitochondrial scatter by default; histogram, density and count/gene families are opt-in |
+| `qc_plot_qc_comparison()` | Paired before/after figure with common axes (default); individual families only with `plots = "all"` |
 | `qc_plot_elbow()` | Saved PCA elbow and numerical PC standard deviations before choosing a range |
 | `qc_plot_qc_umap()` | Combined QC/key-gene panels, Phase/doublet classes and cluster view |
 | `qc_umap_sweep()` | Explicit PC/UMAP-neighbor/min.dist table, with cluster/key-gene grids |

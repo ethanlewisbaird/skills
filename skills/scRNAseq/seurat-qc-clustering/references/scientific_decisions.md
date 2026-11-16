@@ -106,13 +106,37 @@ choice to justify for the actual data, not a universal assumption. Expose `dbr`,
 require a documented alternative. Do not interpret every high-count cell as a
 doublet or claim homotypic doublets have been eliminated.
 
+Compare the fitted call fraction with that expected-rate band. `dbr_sd` expresses
+real uncertainty in loading, not a range wide enough to admit a desired call rate,
+and the threshold optimiser can still return a fraction above the upper bound.
+When the fraction exceeds the band, or the score distribution has no separation,
+treat the calls as provisional: refit independently (`clusters = TRUE`, a different
+`score`, a documented alternative caller, or a different seed for stochastic
+variation), report the overlap and disagreement, and remove only cells supported by
+both fits. Keep method-specific calls as flagged metadata for later cluster review.
+A marker gate assessed at matched RNA complexity can support that review, but
+co-detection is not proof of a multiplet and absence after filtering is not proof
+of a lost state. `qc_doublets()` records the threshold and called fraction and warns
+when the fraction exceeds the band; that warning is a review prompt, not a failure.
+
 ```r
-seu <- qc_doublets(seu, capture_column = capture_column,
-                    seed = seed, workers = doublet_workers, dbr = expected_rate,
-                    out_dir = out_dir)
+fit_a <- qc_doublets(seu, capture_column = capture_column,
+                     seed = seed, workers = doublet_workers, dbr = expected_rate,
+                     out_dir = out_dir)
+fit_a$doublet_fit_a <- fit_a$scDblFinder.class
 # Inspect score histograms, calls by capture/sample and biological marker evidence.
-seu <- qc_remove_doublets(seu, reason = doublet_rationale)
+# Refit independently when the rate or score separation is in doubt.
+fit_b <- qc_doublets(fit_a, capture_column = capture_column, seed = seed,
+                     dbr = expected_rate, clusters = TRUE)
+fit_a$doublet_consensus <- ifelse(fit_a$doublet_fit_a == "doublet" &
+                                    fit_b$scDblFinder.class == "doublet", "doublet", "singlet")
+fit_a <- qc_remove_doublets(fit_a, reason = doublet_rationale,
+                            class_column = "doublet_consensus")
 ```
+
+`qc_remove_doublets(class_column = ...)` lets the removal follow an explicit
+consensus or reviewer column instead of whichever fit ran last. Keep the
+method-specific classes and scores in metadata for cluster review.
 
 Source: [scDblFinder's author documentation](https://plger.github.io/scDblFinder/articles/scDblFinder.html).
 
@@ -249,11 +273,12 @@ approved QC cutoffs or regression.
 Preserve `qc_before <- qc_metadata(seu)` before filtering. With `out_dir`, `qc_apply()`
 also saves this lightweight snapshot as `tables/qc_metrics_before.csv`. Run
 `qc_plot_qc_comparison(qc_before, qc_metadata(seu), out_dir)` after cell QC, and again
-with a distinct prefix after doublet removal if both stages should be shown. The
-same violin, histogram, density and counts/genes/mitochondrial scatter families are
-saved before/after with reference axes. Paired violins share scales within each
-metric. State whether "after QC" includes doublet removal. Preserve original
-count-based metrics when later modeling excludes genes.
+with a distinct prefix after doublet removal if both stages should be shown. Its
+default paired figure shares scales within each metric and is the retained
+comparison; individual before/after violin, histogram, density and
+counts/genes/mitochondrial scatter families are generated only with `plots = "all"`
+when a decision needs them. State whether "after QC" includes doublet removal.
+Preserve original count-based metrics when later modeling excludes genes.
 
 For an unfiltered view, build a separately named diagnostic model from original
 called cells in the same persistent workspace. Inspect memory before adding it

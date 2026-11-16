@@ -134,6 +134,9 @@ run_tests <- function() {
   stopifnot(all(override$flags$pass))
   rules <- list(nCount_RNA = c(100, 10000), nFeature_RNA = c(30, 600), percent.mt = c(0, 100))
   preview <- qc_preview(seu, plots, rules = rules)
+  stopifnot(!any(grepl("_umap.jpeg", preview$files, fixed = TRUE)),
+             length(preview$files) == 2L,
+             all(file.exists(file.path(plots, "tables", c("qc_preview_retention.csv", "qc_preview_boundaries.csv")))))
   filtered <- qc_apply(seu, preview, reason = "Synthetic inclusive thresholds", out_dir = plots)
   stopifnot(identical(colnames(filtered), preview$flags$cell_id[preview$flags$pass]))
   altered <- seu
@@ -173,6 +176,8 @@ run_tests <- function() {
   detected <- qc_doublets(prepared, workers = 2L, seed = 73, dbr = 0.05, out_dir = plots)
   stopifnot(!anyNA(detected$scDblFinder.class), identical(qc_counts(detected), qc_counts(prepared)),
              length(tail(qc_info(detected)$history, 1)[[1]]$parameters$captures) == 2L)
+  clustered_detection <- suppressWarnings(qc_doublets(prepared, workers = 1L, seed = 73, dbr = 0.05, clusters = TRUE))
+  stopifnot(!anyNA(clustered_detection$scDblFinder.class), identical(qc_counts(clustered_detection), qc_counts(prepared)))
   singlets <- qc_remove_doublets(detected, "Synthetic doublet review")
   stopifnot(all(singlets$scDblFinder.class == "singlet"))
   note("actual scDblFinder by two captures across three samples; raw RNA despite active SCT; complete ID matching")
@@ -181,7 +186,8 @@ run_tests <- function() {
   before_metadata <- seu[[]]
   after_metadata <- before_metadata[seq(1, nrow(before_metadata), by = 2), , drop = FALSE]
   paired <- qc_plot_qc_comparison(before_metadata, after_metadata, plots)
-  stopifnot(all(file.exists(paired)), any(grepl("before_after_violin", paired)))
+  stopifnot(all(file.exists(paired)), any(grepl("before_after_violin", paired)),
+             !any(grepl("_before_violin", paired, fixed = TRUE)))
   stopifnot(file.exists(file.path(plots, "tables", "qc_metrics_before.csv")))
   qc_plot_elbow(prepared, plots, ndims = 10, prefix = "test_pca")
   diagnostic <- clustered
@@ -200,7 +206,7 @@ run_tests <- function() {
              identical(input_partition, qc_info(clustered)$partition_id), embedding_sweep$provisional)
   note("paired QC suites; metadata snapshots; PCA elbow; diagnostic gene/QC panels; explicit UMAP parameter grid")
   qc_plot_embedding(clustered, plots, features = c("G21", "missing_optional_gene"), group_by = c("seurat_clusters", "genotype"))
-  embedded_preview <- qc_preview(clustered, plots, rules = rules, prefix = "qc_with_umap")
+  embedded_preview <- qc_preview(clustered, plots, rules = rules, prefix = "qc_with_umap", umap = TRUE)
   stopifnot(any(grepl("_umap.jpeg", embedded_preview$files, fixed = TRUE)))
   sweep <- qc_cluster_sweep(prepared, dimensions = c(6L, 8L), resolutions = c(0.3, 0.5), out_dir = plots, k = 15L, umap_neighbors = 20L)
   stopifnot(ncol(sweep$assignments) == 5L, is.null(qc_info(prepared)$partition_id))
