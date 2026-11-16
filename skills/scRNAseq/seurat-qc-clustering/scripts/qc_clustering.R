@@ -529,7 +529,8 @@ qc_remove_doublets <- function(seu, reason, class_column = "scDblFinder.class") 
   }
   if (!any(calls == "singlet")) stop("No singlets remain.")
   counts <- table(calls)
-  seu <- subset(seu, cells = colnames(seu)[calls == "singlet"])
+  keep <- colnames(seu)[calls == "singlet"]
+  seu <- seu[, keep]
   if ("doublet" %in% names(counts) && counts[["doublet"]] > 0) {
     seu@misc$qc_clustering$partition_id <- NULL
     seu@misc$qc_clustering$model_current <- FALSE

@@ -126,9 +126,10 @@ helper and guidance level; no research object was modified by the skill change.
   artifacts, and an independent second fit before removal when the call rate exceeds
   the expected band.
 
-Functional workflow job `46011` (partition fast, 2 CPUs, 8G) passed all synthetic
-tests with R 4.4.2, Seurat 5.3.0 and scDblFinder 1.20.2, including the reduced
-default preview outputs, the opt-in UMAP, the paired-only comparison, the
-cluster-based doublet fit and the updated test expectations. The run record is
+Functional workflow jobs `46011` and `46013` (partition fast, 2 CPUs, 8G) passed all
+synthetic tests with R 4.4.2, Seurat 5.3.0 and scDblFinder 1.20.2, including the
+reduced default preview outputs, the opt-in UMAP, the paired-only comparison, the
+cluster-based doublet fit and the updated test expectations. Job `46013` covered the
+final helper with `class_column` removal and direct cell indexing. The run record is
 `logs/validation_record.R`; generated fixtures were removed. This validates software
 behaviour, not the doublet policy or thresholds of any real dataset.
