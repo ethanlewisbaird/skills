@@ -1,6 +1,6 @@
 # Evaluation protocol
 
-Evaluate decisions, actions and evidence semantics rather than matching phrases. Keep expected outcomes separate from an independent agent's prompt. Use only synthetic fixtures and private temporary memory. Never treat simulated learner answers as the user's learning evidence. Preserve a concise outcome report; clean temporary workspaces. Run substantial evaluations through Slurm on this HPC. Structural validity and instruction inspection are not behavioral proof.
+Evaluate decisions, actions and evidence semantics rather than matching phrases. Keep expected outcomes separate from an independent agent's prompt. Use only synthetic fixtures and private temporary memory. Never treat simulated learner answers as Ethan's learning evidence. Preserve a concise outcome report; clean temporary workspaces. Run substantial evaluations through Slurm on this HPC. Structural validity and instruction inspection are not behavioral proof.
 
 For forward tests, give the agent the skill path, the scenario and minimal raw artifacts, without these expected outcomes or prior conclusions. Capture its next response/action/evidence decision. A one-turn vignette tests decision behavior, not a full interactive session or successful execution. A multi-turn test must actually supply later answers and inspect the response. An execution test must inspect created outputs and independent checks.
 

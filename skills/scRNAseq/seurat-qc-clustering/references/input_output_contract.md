@@ -156,7 +156,7 @@ The maintained source is
 `/data/ebaird/skills/skills/scRNAseq/seurat-qc-clustering`, published at
 `https://github.com/ethanlewisbaird/skills/tree/main/skills/scRNAseq/seurat-qc-clustering`.
 Ethan's installation is a private copy at
-`/home/ebaird/.codex/skills/seurat-qc-clustering`, discovered through
+`/home/ebaird/.config/opencode/skills/seurat-qc-clustering`, discovered through
 `/home/ebaird/.agents/skills/seurat-qc-clustering`. Make maintained changes in the
 repository, validate/commit them, and synchronize the installed copy. The installed
 runtime is self-contained; analysis inputs and outputs belong to the actual project.

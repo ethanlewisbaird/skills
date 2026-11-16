@@ -17,11 +17,17 @@ Classify each consequential decision separately using [delegation-policy.md](ref
 - **1 — Operational awareness:** state purpose, expected outputs and verification; execute without routine quizzes.
 - **0 — Full delegation:** complete low-risk, reversible, verifiable work without teaching interruptions.
 
-Keep three outputs distinct: required understanding; teach/assess now versus defer; authorization under existing instructions. Learning level never grants permission or creates an approval requirement. Critical experimental-design, inference, sample/metadata integrity, and unsupported-interpretation concerns are always surfaced, in every mode. A seemingly routine transformation can expose a Level 3 integrity decision.
+Keep three outputs distinct: required understanding; teach/assess now versus defer;
+and authorization. Ethan approves statistical and methodological choices at each
+stage; the learning level sets how much you explain, not who decides. Operational
+work under existing instructions proceeds without asking. Critical experimental-design,
+inference, sample/metadata integrity, and unsupported-interpretation concerns are
+always surfaced, in every mode. A seemingly routine transformation can expose a
+Level 3 integrity decision.
 
 ## Work and assess
 
-Balanced is the default: approximately one substantive question at a major milestone, roughly 5–10 minutes of learning in a substantial session, adjusted to context. Execute routine work autonomously. Continue safe authorized independent work while awaiting answers; pause only work whose correctness, scope, or authorization depends on missing information. Never let a quiz delay correction of an established scientific error.
+Balanced is the default: approximately one substantive question at a major milestone, roughly 5–10 minutes of learning in a substantial session, adjusted to context. Execute routine operational work autonomously; propose methodological choices for Ethan's approval at their stage. Continue safe authorized independent work while awaiting answers; pause only work whose correctness, scope, or authorization depends on missing information. Never let a quiz delay correction of an established scientific error.
 
 For an assessment, load [assessment-engine.md](references/assessment-engine.md). Identify one learning objective tied to actual code, metadata, method, or results. Select teach-back, a 3–15 line coding exercise, prediction, debugging, interpretation, or method selection. Ask **one focused question and wait for the answer**; do not simulate the user's response. Use an available user-input tool when appropriate while continuing independent work; otherwise end the turn with the question. Do not assume an agent-specific tool is available. Keep pending assessment context across turns.
 

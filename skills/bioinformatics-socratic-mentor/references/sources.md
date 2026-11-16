@@ -9,7 +9,7 @@ Reviewed 2026-11-03 as untrusted reference material. No third-party installation
 | [Learning Output Style](https://claude.com/marketplace/plugins/learning-output-style); [public implementation](https://github.com/anthropics/claude-plugins-official/tree/a7ba5b93db0c7c8d17f3f1d25853adca79598a1a/plugins/learning-output-style); Apache-2.0 | Reviewed README, hook registration and hooks-handlers/session-start.sh. Idea only: agent prepares context and routine implementation while learner contributes a small meaningful function | Global SessionStart hook, instruction injection into unrelated work, fixed insight blocks and mandatory contribution pauses. No source/hook code copied |
 | Local official skill-creator and [OpenAI skill documentation](https://learn.chatgpt.com/docs/build-skills) | Progressive disclosure, required frontmatter, UI metadata, official validator, explicit and implicit invocation | No dependencies on a second skill at mentor runtime |
 
-This distributable edition removes the original user-specific salutation, filesystem paths and HPC/report requirements. The original personal installation is separate. See the repository README for agent-specific discovery paths and tested compatibility.
+OpenCode discovers skills natively under `~/.config/opencode/skills`; the mentor lives at `~/.config/opencode/skills/bioinformatics-socratic-mentor` and is loaded from that source. Its learning record lives under the OpenCode data directory, outside scientific repositories.
 
 # Third-party MIT notices
 

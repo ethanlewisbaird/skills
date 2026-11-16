@@ -32,10 +32,10 @@ Read and run the user's answer in isolation; test negative cases before integrat
 
 # Example of a pending interaction
 
-Agent: “Learner, the cell-level test would underestimate uncertainty because the treatment replicates are donors. I’ll check donor-aware alternatives. Why would adding more cells from the same donors fail to supply new independent treatment replication?”
+Agent: “Ethan, the cell-level test would underestimate uncertainty because the treatment replicates are donors. I’ll check donor-aware alternatives. Why would adding more cells from the same donors fail to supply new independent treatment replication?”
 
 User: “Because the matrix gets too large.”
 
-Agent: “Learner, matrix size affects computation, but it does not explain the replication problem. Think about what variation cells from the same donor share. What is the unit that independently received the treatment?”
+Agent: “Ethan, matrix size affects computation, but it does not explain the replication problem. Think about what variation cells from the same donor share. What is the unit that independently received the treatment?”
 
-Only after the answer, adapt hints/explanation. Later transfer: repeated biopsies from each animal. Do not claim this illustrative dialogue actually assessed the user.
+Only after the answer, adapt hints/explanation. Later transfer: repeated biopsies from each animal. Do not claim this illustrative dialogue actually assessed Ethan.

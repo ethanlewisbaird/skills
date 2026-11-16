@@ -1,15 +1,15 @@
 # Local evidence, not a mastery score
 
-Default (retained for compatibility with the original personal version): `${CODEX_HOME:-$HOME/.codex}/learning/bioinformatics-socratic-mentor/record.json`. This is just a local data directory; Codex does not need to be installed. Other agents can choose their own private local directory using `--directory` on every invocation. The helper requires Python 3.8+ on Linux; other operating systems have not been tested. No network, cloud, repo files or automatic telemetry. `--directory /private/user/chosen/location` overrides the location; do not silently migrate existing records. Keep global concepts (`project: null`) separate from project observations (a sanitized user-controlled alias, never a path/participant identifier). The file stores append-only observations except explicit corrections; inspect the relevant history rather than treating one latest status as permanent ability. A skip should normally add nothing, leaving earlier evidence unchanged.
+Default: `${XDG_DATA_HOME:-$HOME/.local/share}/opencode/learning/bioinformatics-socratic-mentor/record.json`. No network, cloud, repo files or automatic telemetry. `--directory /private/user/chosen/location` overrides the location; do not silently migrate existing records. Keep global concepts (`project: null`) separate from project observations (a sanitized user-controlled alias, never a path/participant identifier). The file stores append-only observations except explicit corrections; inspect the relevant history rather than treating one latest status as permanent ability. A skip should normally add nothing, leaving earlier evidence unchanged.
 
-The agent is responsible for content sanitization. The helper validates structure and several evidence invariants; `--sanitized` is an explicit caller assertion, **not** a privacy detector. Never store patient/sample identifiers, confidential excerpts, raw answers, credentials or unnecessary research details. Summarize conceptual reasoning and misconceptions in general terms. Do not put sensitive content in CLI arguments or temporary payload files. Do not read memory when session mentoring/memory is off. On first actual use briefly tell the user the local location and controls; this skill's installation does not create a real learner record.
+The agent is responsible for content sanitization. The helper validates structure and several evidence invariants; `--sanitized` is an explicit caller assertion, **not** a privacy detector. Never store patient/sample identifiers, confidential excerpts, raw answers, credentials or unnecessary research details. Summarize conceptual reasoning and misconceptions in general terms. Do not put sensitive content in CLI arguments or temporary payload files. Do not read memory when session mentoring/memory is off. On first actual use briefly tell Ethan the local location and controls; this skill's installation does not create a real learner record.
 
 # Commands
 
-Resolve the skill directory from the loaded SKILL.md. Set mentor_script to the helper in your installed skill folder; use `python .../scripts/learning_record.py --help` for CLI details.
+Resolve the skill directory from the loaded SKILL.md. Examples below assume the default installation; use `python .../scripts/learning_record.py --help` for CLI details.
 
 ```bash
-mentor_script="/absolute/path/to/bioinformatics-socratic-mentor/scripts/learning_record.py"
+mentor_script="$HOME/.config/opencode/skills/bioinformatics-socratic-mentor/scripts/learning_record.py"
 python "$mentor_script" inspect
 python "$mentor_script" validate
 python "$mentor_script" export > /chosen/private/location/learning-export.json
@@ -42,7 +42,7 @@ For add/correct, pass one sanitized JSON object through stdin:
 }
 ```
 
-This example is synthetic schema documentation, not the user's evidence. `add --sanitized` appends without overwriting prior evidence. `correct INDEX --sanitized` replaces precisely the zero-based observation shown by inspect; use only for an explicit correction, not to rewrite past mistakes as successes. Omit skipped observations by default. No pending exercise needs persistence unless a sanitized project note is useful.
+This example is synthetic schema documentation, not Ethan's evidence. `add --sanitized` appends without overwriting prior evidence. `correct INDEX --sanitized` replaces precisely the zero-based observation shown by inspect; use only for an explicit correction, not to rewrite past mistakes as successes. Omit skipped observations by default. No pending exercise needs persistence unless a sanitized project note is useful.
 
 # Evidence semantics
 

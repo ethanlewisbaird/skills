@@ -11,9 +11,19 @@ rollback: inspect the current workspace before retrying an affected operation.
 The examples below illustrate the API. Their sample names and paths are schema
 examples, not facts about a dataset or recommended QC values.
 
+## Approval gates
+
+Ethan approves every methodological setting at its stage: QC cutoffs and exclusion
+policy, doublet rate and removal consensus, normalisation and SCT flavour, cell-cycle
+regression and covariates, excluded features, PC count, clustering algorithm and
+resolution, accepted partition and any merge. Present the options and their
+downstream effects before calling `qc_log_transform()`, `qc_apply()`,
+`qc_remove_doublets()`, `qc_prepare()`, `qc_cluster()` or `qc_curate_clusters()`.
+A previous run supplies a reference setting, not approval for this object.
+
 ```r
 # In a one-time initializer, after choosing the real environment, project and inputs:
-source("/home/ebaird/.codex/skills/seurat-qc-clustering/scripts/qc_clustering.R")
+source("/home/ebaird/.config/opencode/skills/seurat-qc-clustering/scripts/qc_clustering.R")
 qc_resources(workers = 1L, blas_threads = 1L)
 inputs <- list(
   public = list(type = "text", path = "/path/to/matrix.txt", sep = "\t",
@@ -264,7 +274,7 @@ partition-selection milestone while a consequential interpretation remains open.
 ### Interactive milestones and restored diagnostic figures
 
 After showing each unfiltered/post-QC PCA elbow, obtain the PC range, resolution
-range and UMAP layout grid unless already specified or explicitly delegated. After
+range and UMAP layout grid unless Ethan has approved them for this object. After
 showing comparisons and marker/sample evidence, obtain the retained partition choice
 before calling it accepted. A previous setting supplies a provisional reference,
 not approval of a new result. Reuse explicit decisions; do not repeatedly ask about

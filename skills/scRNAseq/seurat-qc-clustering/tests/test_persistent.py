@@ -10,7 +10,7 @@ import time
 
 sys.dont_write_bytecode = True
 skill = Path(__file__).resolve().parents[1]
-bridge = Path(os.environ.get("PERSISTENT_ANALYSIS_SKILL", str(Path.home() / ".codex/skills/persistent-analysis")))
+bridge = Path(os.environ.get("PERSISTENT_ANALYSIS_SKILL", str(Path.home() / ".config/opencode/skills/persistent-analysis")))
 core = bridge / "scripts/persistent_analysis.py"
 spec = importlib.util.spec_from_file_location("persistent_analysis", core)
 pa = importlib.util.module_from_spec(spec)

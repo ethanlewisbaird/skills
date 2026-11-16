@@ -125,7 +125,8 @@ def locked(directory):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    default = Path(os.environ.get('CODEX_HOME', str(Path.home() / '.codex'))) / 'learning' / 'bioinformatics-socratic-mentor'
+    data_home = Path(os.environ.get('XDG_DATA_HOME', str(Path.home() / '.local' / 'share')))
+    default = data_home / 'opencode' / 'learning' / 'bioinformatics-socratic-mentor'
     parser.add_argument('--directory', type=Path, default=default, help='User-controlled local memory directory')
     sub = parser.add_subparsers(dest='command', required=True)
     for name in ('inspect', 'export', 'validate', 'disable', 'enable', 'erase'):
