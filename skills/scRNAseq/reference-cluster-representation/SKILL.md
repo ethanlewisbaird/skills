@@ -83,6 +83,7 @@ Each row reports:
 - percentage-point difference and log2 enrichment with a pseudocount;
 - median top score and margin, and the fraction below the confidence floor;
 - marker concordance: detection difference and fraction of markers enriched;
+  carry `not_assessed` where no validated panel exists;
 - dominant query cluster, with purity and entropy from the crosstab;
 - the verdict and the rule that produced it.
 
@@ -111,8 +112,10 @@ comp <- rr_composition(predictions, reference, matched_group = "flp",
 Report Jensen-Shannon distance, Spearman rank correlation and per-label
 differences between each query sample and the matched and contrast subsets. State
 whether the matched genotype/condition is closer to its counterpart than to the
-contrast. With one query sample per group this is descriptive, not a test; do not
-permute cells or report cell-level p-values.
+contrast. Report the finest matched subset first; pooling ages, timepoints or
+captures can create an intermediate composition that looks like a match. With one
+query sample per group this is descriptive, not a test; do not permute cells or
+report cell-level p-values.
 
 Completion: a table with both comparisons and one sentence on what the design can
 and cannot support.

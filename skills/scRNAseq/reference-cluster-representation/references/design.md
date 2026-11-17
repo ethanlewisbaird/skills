@@ -22,6 +22,14 @@ contrast subset where one exists; it turns "the query resembles the reference" i
 
 If no matched subset exists, say so and treat the comparison as descriptive.
 
+### Do not pool away the matched structure
+
+Pooling reference subsets (ages, timepoints, captures, genotypes) creates an
+intermediate composition. A query can sit closer to that intermediate than to any
+real subset, which is an aggregation artefact rather than evidence of a match.
+Report the finest matched subset first and pooling only as a sensitivity. If the
+query's age is unknown, the age-specific comparisons are the informative ones.
+
 ## Metrics
 
 For reference label \(k\) and query sample \(s\):
@@ -62,6 +70,11 @@ verdict is a reporting device, not a biological boundary.
 confidence. It is not proof of absence: the state may be rare, below the query's
 cell budget, absent from the sampled stage, or obscured by a low-confidence
 mapping. State which of these remains possible.
+
+A label without a validated marker panel can pass the score and composition gates.
+Carry `marker_gate = not_assessed` into the table and describe that verdict as
+weaker than a marker-gated one. A single held-out fold with low precision is a
+warning about transfer stability, not a property of the query.
 
 ## Label transfer is not identity
 
