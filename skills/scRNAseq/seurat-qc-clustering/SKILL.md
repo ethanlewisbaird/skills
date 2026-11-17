@@ -80,9 +80,9 @@ the relevant stage, including concrete API examples and stage-specific checks.
   biological state versus reducing cycle heterogeneity for cell-type analysis.
   Preserve counts/scores and state the risk of removing correlated lineage biology.
   Ask about ribosomal, sex-associated and transposon features **before**
-  normalization or SCT, and record for each class whether it is retained, excluded
-  only from modeling features, or removed from the model gene universe. Do not infer
-  the policy from a previous dataset. Modeling-feature exclusion preserves their RNA
+  normalization or SCT, class by class, and record for each whether it is retained,
+  excluded only from modeling features, or removed from the model gene universe. Do
+  not infer one class's policy from a bundled recommendation or a previous dataset. Modeling-feature exclusion preserves their RNA
   measurements; complete feature removal is a distinct, explicitly requested option.
 - **Explore clustering.** Inspect a saved PCA elbow and bounded PC/resolution sweeps.
   Save and show an elbow for the unfiltered diagnostic model and the post-QC model.
