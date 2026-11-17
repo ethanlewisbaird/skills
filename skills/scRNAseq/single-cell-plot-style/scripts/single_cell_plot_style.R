@@ -58,7 +58,7 @@ sc_category_style <- function(n = NULL, aesthetic = c("colour", "fill"), ...) {
 # `data` is a data frame with coordinate and cluster columns; `palette` is optional.
 sc_cluster_map <- function(data, x = "UMAP_1", y = "UMAP_2", cluster = "cluster",
                            label_size = 5, point_size = 0.4, alpha = 0.65,
-                           palette = NULL, seed = 1) {
+                           repel = FALSE, palette = NULL, seed = 1) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
   data <- as.data.frame(data)
   if (!all(c(x, y, cluster) %in% names(data))) {
@@ -79,14 +79,15 @@ sc_cluster_map <- function(data, x = "UMAP_1", y = "UMAP_2", cluster = "cluster"
     ggplot2::coord_fixed() + ggplot2::theme_void(base_size = 11) +
     sc_category_style(n = length(levels), aesthetic = "colour") +
     ggplot2::theme(legend.position = "none")
-  if (requireNamespace("ggrepel", quietly = TRUE)) {
+  if (repel && requireNamespace("ggrepel", quietly = TRUE)) {
     p <- p + ggrepel::geom_text_repel(data = centres,
       ggplot2::aes(label = .data[[cluster]]), size = label_size, colour = "black",
-      seed = seed, min.segment.length = 0, box.padding = 0.25,
+      fontface = "bold", seed = seed, min.segment.length = 0, box.padding = 0.25,
       point.padding = 0.15, max.overlaps = Inf, show.legend = FALSE)
   } else {
     p <- p + ggplot2::geom_text(data = centres,
-      ggplot2::aes(label = .data[[cluster]]), size = label_size, colour = "black")
+      ggplot2::aes(label = .data[[cluster]]), size = label_size, colour = "black",
+      fontface = "bold")
   }
   p
 }

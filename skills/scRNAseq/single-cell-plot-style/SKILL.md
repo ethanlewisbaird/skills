@@ -88,9 +88,11 @@ sample-count vector into a continuous scale, and do not reuse the feature palett
   `theme_void()` for maps unless the analysis already sets something else.
 - Cluster maps label each cluster at its centroid and **omit the cluster legend**.
   Use `sc_cluster_map()` for data-frame coordinates or `sc_dimplot_clusters()` for
-  Seurat. Label size 5; numeric clusters in numeric order; check that no label is
-  clipped or hidden. Keep a legend only for a non-labelled variable (sample,
-  genotype, condition); never duplicate cluster identity in a legend.
+  Seurat. Labels sit at the cluster centroid by default; enable repulsion only when
+  labels overlap, and check that labels remain on their cluster. Label size 5;
+  numeric clusters in numeric order; check that no label is clipped or hidden. Keep
+  a legend only for a non-labelled variable (sample, genotype, condition); never
+  duplicate cluster identity in a legend.
 - Sample/genotype maps keep their legend because the categories are not labelled
   on the plot; do not add cluster numbers to those panels.
 
