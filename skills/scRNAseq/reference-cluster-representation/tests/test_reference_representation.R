@@ -63,7 +63,8 @@ clusters[noise] <- sample(unique(clusters), length(noise), TRUE)
 names(clusters) <- predictions$cell
 
 design <- rr_check_design(reference, predictions)
-stopifnot(nrow(design$reference_counts) == 5L,
+stopifnot(identical(rr_sort_labels(c("10", "2", "0", "1")), c("0", "1", "2", "10")),
+  nrow(design$reference_counts) == 5L,
   sum(design$reference_counts$flp) == sum(ref_counts$flp),
   sum(design$query_counts$Qmatch) == sum(query_counts$Qmatch))
 

@@ -18,6 +18,11 @@ rr_require_columns <- function(x, columns, label) {
   if (length(absent)) stop(label, " is missing column(s): ", paste(absent, collapse = ", "))
 }
 
+rr_sort_labels <- function(x) {
+  x <- unique(as.character(x))
+  if (length(x) && all(grepl("^[0-9]+$", x))) x[order(as.integer(x))] else sort(x)
+}
+
 rr_counts <- function(labels, groups, levels_labels, levels_groups) {
   tab <- table(factor(labels, levels = levels_labels), factor(groups, levels = levels_groups))
   tab <- as.data.frame.matrix(tab)
@@ -47,7 +52,7 @@ rr_check_design <- function(reference, predictions, label = "label", ref_sample 
   if (anyDuplicated(predictions$cell)) stop("predictions has duplicated cells.")
   if (anyNA(reference[[label]])) stop("reference labels contain NA.")
   if (anyNA(predictions[[prediction_label]])) stop("predictions contain NA labels.")
-  labels <- sort(unique(as.character(reference[[label]])))
+  labels <- rr_sort_labels(reference[[label]])
   groups <- sort(unique(as.character(reference[[ref_group]])))
   unknown <- setdiff(unique(as.character(predictions[[prediction_label]])), labels)
   if (length(unknown)) stop("predicted labels absent from the reference: ", paste(unknown, collapse = ", "))
@@ -70,7 +75,7 @@ rr_composition <- function(predictions, reference, matched_group, contrast_group
                            pseudocount = 0.5) {
   rr_require_columns(reference, c("cell", label, ref_group), "reference")
   rr_require_columns(predictions, c("cell", query_sample, prediction_label), "predictions")
-  labels <- sort(unique(as.character(reference[[label]])))
+  labels <- rr_sort_labels(reference[[label]])
   unknown <- setdiff(unique(as.character(predictions[[prediction_label]])), labels)
   if (length(unknown)) stop("predicted labels absent from the reference: ", paste(unknown, collapse = ", "))
   groups <- unique(as.character(reference[[ref_group]]))
@@ -134,8 +139,8 @@ rr_score_summary <- function(predictions, by = "sample", score = "top_score",
 rr_cluster_crosstab <- function(predictions, cluster, prediction_label = "predicted_label") {
   rr_require_columns(predictions, c("cell", prediction_label), "predictions")
   cluster <- rr_align(cluster, predictions$cell, "cluster")
-  labels <- sort(unique(as.character(predictions[[prediction_label]])))
-  clusters <- sort(unique(as.character(cluster)))
+  labels <- rr_sort_labels(predictions[[prediction_label]])
+  clusters <- rr_sort_labels(cluster)
   counts <- table(factor(cluster, levels = clusters),
     factor(predictions[[prediction_label]], levels = labels))
   mat <- as.matrix(counts)
@@ -166,7 +171,7 @@ rr_marker_concordance <- function(counts, predictions, markers, label = "label",
   if (!is.null(sample) && !sample %in% names(predictions)) stop("sample column is absent from predictions.")
   missing_cells <- setdiff(predictions$cell, colnames(counts))
   if (length(missing_cells)) stop("counts is missing ", length(missing_cells), " prediction cells.")
-  labels <- sort(unique(as.character(markers$label)))
+  labels <- rr_sort_labels(markers$label)
   scopes <- if (is.null(sample)) list(all = rep(TRUE, nrow(predictions))) else
     split(seq_len(nrow(predictions)), as.character(predictions[[sample]]))
   out <- list()
@@ -302,6 +307,8 @@ rr_plot_composition <- function(composition, value = "query_fractions") {
     data.frame(label = rownames(m), group = g, fraction = m[, g],
       stringsAsFactors = FALSE)
   }))
+  long$label <- factor(long$label, levels = rownames(m))
+  long$group <- factor(long$group, levels = colnames(m))
   ggplot2::ggplot(long, ggplot2::aes(group, label, fill = fraction)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient(low = "#f7f7f7", high = "#08519c") +
@@ -316,6 +323,8 @@ rr_plot_crosstab <- function(crosstab) {
     data.frame(cluster = m$cluster, label = lb, fraction = m[[lb]],
       stringsAsFactors = FALSE)
   }))
+  long$label <- factor(long$label, levels = names(m)[-1])
+  long$cluster <- factor(long$cluster, levels = m$cluster)
   ggplot2::ggplot(long, ggplot2::aes(label, cluster, fill = fraction)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient(low = "#f7f7f7", high = "#08519c") +
