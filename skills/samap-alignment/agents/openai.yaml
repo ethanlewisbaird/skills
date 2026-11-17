@@ -1,0 +1,4 @@
+interface:
+  display_name: "SAMap cross-species alignment"
+  short_description: "Fit, score and stress-test a SAMap cross-species alignment"
+  default_prompt: "Use $samap-alignment to prepare a SAMap run, reuse the homology graph, and score state-by-reference weights with the right comparator."

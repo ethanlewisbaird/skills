@@ -15,6 +15,7 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [scrna-integration](skills/scRNAseq/scrna-integration/SKILL.md) | Integration model comparison after diagnostics: paired mixing metrics, displacement versus composition change, detached-island evidence, representation and tuning sweeps, and correction-versus-preservation tables. |
 | [ambient-rna-removal](skills/scRNAseq/ambient-rna-removal/SKILL.md) | Per-capture SoupX and CellBender estimation, visible rho gates, cell-call ownership, and verification that corrected counts reached the accepted object. |
 | [orthologue-coverage](skills/orthologue-coverage/SKILL.md) | Cross-species signature feasibility: stable-ID resolution, reciprocal score-best versus broader mapping, paralogue ambiguity and assayed/expressed coverage. Includes a metadata-only audit helper. |
+| [samap-alignment](skills/samap-alignment/SKILL.md) | SAMap cross-species scRNA-seq: input and identifier contracts, homology-graph build or reuse, per-species SAM fits, joint scoring, reference-composition sensitivities and claim checks. |
 | [scientific-report-writing](skills/scientific-report-writing/SKILL.md) | Reader-facing scientific narratives organized around research questions and selected evidence, with technical provenance maintained separately. |
 
 The scRNA-seq collection is under `skills/scRNAseq/`. Install the complete
@@ -133,6 +134,14 @@ mapping or coverage. This validates the implementation, rather than biological
 conservation or a disease classifier.
 Run `python skills/orthologue-coverage/scripts/test_audit_coverage.py` for the
 portable synthetic checks; the pilot data are not bundled with the skill.
+
+`samap-alignment` was written on 2026-11-17 from a completed fly-versus-human
+analysis (fourteen reference-sensitivity fits plus two Neftel fits). Every encoded
+gotcha was observed and corrected there: categorical-obs loss, shared-interpreter name
+collisions, the pandas 3 positional-index bug, padded-graph versus initial-match
+metadata, and UMAP initialisation fallback. The documented graph-reuse path reproduced
+338,910 stored homology edges without BLAST, and the claim-check pattern reproduced
+the narrative tallies. It adds no bundled validation script.
 
 `single-cell-plot-style` passed skill validation and synthetic R checks on
 2026-11-05 (Slurm job 40501; R 4.4.2, ggplot2 4.0.2, scales 1.4.0,
