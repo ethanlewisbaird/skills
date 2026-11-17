@@ -279,3 +279,7 @@ Verified every parsed cell matches the TSV exactly, preserving identifiers, inte
 
 </details>
 
+
+## Install location migration — 2026-11-16
+
+The paths above record the 2026-11-03 evaluation and are unchanged. Skills later moved to the OpenCode-native location, so the current install is `/home/ebaird/.config/opencode/skills/bioinformatics-socratic-mentor`, maintained from `/data/ebaird/skills/skills/bioinformatics-socratic-mentor`. `/home/ebaird/.codex/` was removed on 2026-11-16.

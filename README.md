@@ -12,6 +12,8 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [batch-effect-diagnostics](skills/scRNAseq/batch-effect-diagnostics/SKILL.md) | Diagnose sample-associated structure before integration: mixed-cluster pseudobulk, depth-matched cross-sample distances, covariate attribution, ambient limits and reference-label consistency. Includes reusable R functions and a synthetic test. |
 | [single-cell-plot-style](skills/scRNAseq/single-cell-plot-style/SKILL.md) | Ethan's default feature/module-map palette, shared feature limits, and white-to-forest-green expression dotplots on a 0–2.5 colour scale. Includes reusable R plot components. |
 | [single-cell-differential-expression](skills/scRNAseq/single-cell-differential-expression/SKILL.md) | Within-state condition contrasts: exploratory Seurat screens, raw-count pseudobulks, sample/design gates and replicated edgeR QL tests. |
+| [scrna-integration](skills/scRNAseq/scrna-integration/SKILL.md) | Integration model comparison after diagnostics: paired mixing metrics, displacement versus composition change, detached-island evidence, representation and tuning sweeps, and correction-versus-preservation tables. |
+| [ambient-rna-removal](skills/scRNAseq/ambient-rna-removal/SKILL.md) | Per-capture SoupX and CellBender estimation, visible rho gates, cell-call ownership, and verification that corrected counts reached the accepted object. |
 | [orthologue-coverage](skills/orthologue-coverage/SKILL.md) | Cross-species signature feasibility: stable-ID resolution, reciprocal score-best versus broader mapping, paralogue ambiguity and assayed/expressed coverage. Includes a metadata-only audit helper. |
 | [scientific-report-writing](skills/scientific-report-writing/SKILL.md) | Reader-facing scientific narratives organized around research questions and selected evidence, with technical provenance maintained separately. |
 
@@ -50,11 +52,29 @@ and unfinished template placeholders. Panel counts are explicit declarations
 verified by inspecting the figures; unannotated figures fail rather than default
 to one panel. See the skill's [HTML check guidance](skills/scientific-report-writing/references/html_checks.md).
 
-Clone this repository to a location you control, then copy or symlink the **whole skill folder**, including its references and scripts, into your agent's discovery directory. The examples below assume the clone is at `$HOME/skills`; choose a different clone location if that directory already exists. They do not overwrite an existing installed skill.
+Clone this repository to a location you control, then install the **whole skill folder**, including its references and scripts, into your agent's discovery directory. The examples below assume the clone is at `$HOME/skills`; choose a different clone location if that directory already exists.
 
 ```bash
 git clone https://github.com/ethanlewisbaird/skills.git "$HOME/skills"
 ```
+
+## Install and keep copies in sync
+
+The repository is the source of truth, and hosts read skills from separate
+directories, so the copies drift silently: a corrected helper never reaches the
+host that loads it. `sync_skills.py` copies every skill here into each configured
+discovery root and reports per-skill state.
+
+```bash
+cd "$HOME/skills"
+./sync_skills.py check      # same / differs / absent per root; no changes
+./sync_skills.py install    # replace stale copies, then report
+```
+
+Roots are listed in the script and include `~/.agents/skills`, `~/.codex/skills`
+and `~/.config/opencode/skills`. Directories a root holds that this repository does
+not are reported as unmanaged and left alone. Runtime noise (`*.log`,
+`__pycache__`) is neither installed nor compared.
 
 Choose one installation target:
 
@@ -126,6 +146,18 @@ Seurat detection filtering/Bonferroni values and unchanged input objects. See it
 [validation record](skills/scRNAseq/single-cell-differential-expression/references/validation.md)
 for versions, command, source hashes and task logs. It selects methods from the
 experimental design; it does not turn cell partitions into biological replicates.
+
+`scrna-integration` passed syntax and synthetic R checks on 2026-11-17: ARI identity
+and symmetry, focal purity and pure-group counts against a deterministic fixture,
+distance-summary extraction, marker/top-gap/reference dominance handling, and
+neighbour composition of a detached island shared across four samples. The fixture
+is synthetic; no fitted model or analysis object was involved.
+
+`ambient-rna-removal` passed synthetic R checks on 2026-11-17: provenance matching
+under reordered and subset cells/genes, unknown counts reported rather than
+attributed, identical candidates reported as indistinguishable, and fractional
+counts not silently rounded into a match. Its SoupX driver and CellBender launcher
+were syntax-checked only; neither was run on real data by these tests.
 
 Run the isolated helper tests on Linux:
 
