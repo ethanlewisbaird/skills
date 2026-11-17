@@ -59,6 +59,12 @@ Read the evidence together:
 | Sample R² remains high after covariates, distance elevated | Unexplained shift: condition biology or an unmeasured technical factor |
 | Reference labels overlap and are abundant in comparison samples | Shared identity; focal-only clusters are sample-separated representations |
 
+D5 is a consistency check, not a representation assessment. When the question is
+whether a new dataset reproduces each reference cluster, or whether a matched
+genotype or condition resembles its reference counterpart, use
+`reference-cluster-representation` for validated transfer, matched composition,
+marker concordance, query-cluster purity and explicit verdicts.
+
 Report the residual ambiguity. With one pool per condition, state that batch and
 condition cannot be separated; a reviewer's agreement or a cleaner embedding does
 not change that.
