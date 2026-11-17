@@ -79,9 +79,11 @@ the relevant stage, including concrete API examples and stage-specific checks.
   SCT flavor. Cell-cycle scoring and regression follow the scientific aim: retaining
   biological state versus reducing cycle heterogeneity for cell-type analysis.
   Preserve counts/scores and state the risk of removing correlated lineage biology.
-  Ribosomal, sex-associated and transposon genes have no universal exclusion policy.
-  Modeling-feature exclusion preserves their RNA measurements; complete feature
-  removal is a distinct, explicitly requested option.
+  Ask about ribosomal, sex-associated and transposon features **before**
+  normalization or SCT, and record for each class whether it is retained, excluded
+  only from modeling features, or removed from the model gene universe. Do not infer
+  the policy from a previous dataset. Modeling-feature exclusion preserves their RNA
+  measurements; complete feature removal is a distinct, explicitly requested option.
 - **Explore clustering.** Inspect a saved PCA elbow and bounded PC/resolution sweeps.
   Save and show an elbow for the unfiltered diagnostic model and the post-QC model.
   **Pause after the elbow** to obtain Ethan's PC range and UMAP settings unless he
