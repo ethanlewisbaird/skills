@@ -55,6 +55,29 @@ def read(path):
     return json.loads(Path(path).read_text())
 
 
+def bridge(session):
+    """Return the helper path for a session, repairing a stale recorded path.
+
+    An install can be moved, replaced or removed after a session was prepared,
+    so a recording that no longer resolves is corrected to the helper serving
+    this call instead of leaving the session pointing at a missing file.
+    """
+    session = private(session)
+    recorded = session / 'bridge.txt'
+    current = Path(__file__).resolve()
+    try:
+        stale = Path(recorded.read_text().strip())
+    except (FileNotFoundError, OSError):
+        stale = None
+    if stale is not None and stale.is_file():
+        return stale
+    recorded.write_text(str(current))
+    recorded.chmod(0o600)
+    if stale is not None:
+        print('Repaired bridge path ' + str(stale) + ' -> ' + str(current), file=sys.stderr)
+    return current
+
+
 def prepare(root, name, language, project, init=None):
     if not NAME.fullmatch(name):
         raise ValueError('Session name must be 1–80 letters/digits/underscores/hyphens')
@@ -127,6 +150,7 @@ def monitor(session, pid):
 
 def status(session):
     private(session)
+    bridge(session)  # A moved or replaced install leaves a stale recorded path.
     launch_info = read(session / 'launch.json') if (session / 'launch.json').exists() else {}
     info = {**read(session / 'session.json'), **launch_info, **read(session / 'worker.json')}
     if info['state'] in {'initializing', 'ready'}:

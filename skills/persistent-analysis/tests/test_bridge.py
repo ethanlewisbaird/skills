@@ -1,5 +1,6 @@
 """Integration tests: run through Slurm; synthetic objects only, no existing workers/jobs."""
 import importlib.util
+import io
 import json
 import os
 from pathlib import Path
@@ -241,6 +242,30 @@ class ProtocolTests(unittest.TestCase):
                 pa.prepare(root, 'test', 'python', work)
             with self.assertRaises(ValueError):
                 pa.prepare(Path(work) / 'safe', '../escape', 'python', work)
+
+    def test_stale_bridge_recording_is_repaired(self):
+        """A session prepared by a since-removed install keeps working."""
+        with tempfile.TemporaryDirectory() as work:
+            session = pa.prepare(Path(work) / 'sessions', 'test', 'python', work)
+            (session / 'bridge.txt').write_text(str(Path(work) / 'removed-install' / 'persistent_analysis.py'))
+            with patch.object(sys, 'stderr', new_callable=io.StringIO) as warning:
+                pa.status(session)
+            self.assertEqual(Path((session / 'bridge.txt').read_text()), CORE.resolve())
+            self.assertIn('Repaired bridge path', warning.getvalue())
+
+    def test_r_worker_falls_back_to_the_copy_beside_it(self):
+        """The R worker resolves its helper when the recorded install is gone."""
+        skill = CORE.parents[1]
+        with tempfile.TemporaryDirectory() as work:
+            session = Path(work) / 'session'
+            session.mkdir(mode=0o700)
+            (session / 'bridge.txt').write_text(str(Path(work) / 'removed-install' / 'persistent_analysis.py'))
+            script = skill / 'worker/worker.R'
+            expression = ('source(file.path("' + str(skill) + '", "worker/worker.R")); '
+                          'cat(persistent_helper("' + str(session) + '", script = "' + str(script) + '"))')
+            result = subprocess.run(['Rscript', '-e', expression], capture_output=True, text=True, timeout=120)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(Path(result.stdout.strip()), (skill / 'scripts/persistent_analysis.py').resolve())
 
     def test_removed_batch_launcher_is_rejected_before_setup(self):
         with tempfile.TemporaryDirectory() as work:

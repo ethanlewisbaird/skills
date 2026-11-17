@@ -144,7 +144,7 @@ With explicit user authorization:
 persistent-analysis --session scrna-r shutdown --confirm
 ```
 
-This lets the active task finish, refuses new work, then returns a manual bootstrap to its original REPL, or ends a dedicated worker and its allocation. It does not issue `scancel` or touch another session. Queued work reports not-executed. Do not edit/replace installed bridge code while a worker still depends on that installation; use a separate installation path for an upgrade, or coordinate a deliberate checkpoint/authorized shutdown first. Never delete a live registry. Stopped records/logs are retained until deliberately archived or removed.
+This lets the active task finish, refuses new work, then returns a manual bootstrap to its original REPL, or ends a dedicated worker and its allocation. It does not issue `scancel` or touch another session. Queued work reports not-executed. Do not edit/replace installed bridge code while a worker still depends on that installation; use a separate installation path for an upgrade, or coordinate a deliberate checkpoint/authorized shutdown first. Never delete a live registry. A moved or removed install does not strand recorded sessions: every command repairs a `bridge.txt` path that no longer resolves, and the R worker falls back to the copy beside its own script (`$PERSISTENT_ANALYSIS_BRIDGE` overrides both). Objects still live only in the running interpreter, so restart from a current install if the interpreter itself died. Stopped records/logs are retained until deliberately archived or removed.
 
 ## Agent integration and tests
 

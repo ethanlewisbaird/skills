@@ -1,18 +1,48 @@
 # Base-R worker. Source this in R/radian, then call persistent_serve(session_directory).
 # The queue loop occupies the interpreter until graceful shutdown or Ctrl-C.
-persistent_serve <- function(session, python = Sys.which("python"), initialize = FALSE) {
+
+# The recorded helper path can go stale when its install is moved, replaced or
+# removed after this worker starts. Prefer the recording, then an explicit
+# override, then the copy beside this script, so the queue stays readable.
+worker_script <- function() {
+    file_argument <- grep("^--file=", commandArgs(trailingOnly = FALSE), value = TRUE)
+    if (length(file_argument) == 0L) return(NULL)
+    normalizePath(sub("^--file=", "", file_argument[1L]), mustWork = FALSE)
+}
+
+persistent_helper <- function(session, script = NULL) {
+    candidates <- character()
+    recorded <- file.path(session, "bridge.txt")
+    if (file.exists(recorded)) {
+        value <- readLines(recorded, warn = FALSE)
+        if (length(value) > 0L && nzchar(value[1L])) candidates <- c(candidates, value[1L])
+    }
+    override <- Sys.getenv("PERSISTENT_ANALYSIS_BRIDGE")
+    if (nzchar(override)) candidates <- c(candidates, override)
+    if (is.null(script)) script <- worker_script()
+    if (!is.null(script))
+        candidates <- c(candidates, file.path(dirname(dirname(script)), "scripts", "persistent_analysis.py"))
+    for (candidate in candidates) {
+        if (file.exists(candidate)) return(normalizePath(candidate))
+    }
+    stop("Bridge helper not found, so this worker cannot read its queue. Checked: ",
+         if (length(candidates) == 0L) "none recorded" else paste(candidates, collapse = ", "),
+         ". Objects remain in memory; reattach from a current install.")
+}
+
+persistent_serve <- function(session, python = Sys.which("python"), initialize = FALSE, script = NULL) {
     session <- normalizePath(session, mustWork = TRUE)
     if (readLines(file.path(session, "language.txt"), warn = FALSE) != "r")
         stop("Session is not configured for R")
     if (exists("persistent_paths", envir = .GlobalEnv, inherits = FALSE))
         stop("The name persistent_paths is reserved; rename it before attaching")
-    helper <- readLines(file.path(session, "bridge.txt"), warn = FALSE)
+    helper <- persistent_helper(session, script)
     control <- function(command, ...) {
         arguments <- c(shQuote(helper), command, shQuote(session), shQuote(as.character(c(...))))
         value <- suppressWarnings(system2(python, arguments, stdout = TRUE))
         status <- attr(value, "status")
         if (!is.null(status) && status != 0L)
-            stop("Bridge control failed: ", command)
+            stop("Bridge control failed: ", command, " via ", helper)
         value
     }
     control("_begin", Sys.getpid())
@@ -23,7 +53,8 @@ persistent_serve <- function(session, python = Sys.which("python"), initialize =
         if (exists("persistent_paths", envir = .GlobalEnv, inherits = FALSE))
             rm("persistent_paths", envir = .GlobalEnv)
         setwd(previous_wd)
-        control(if (normal_exit) "_stopped" else "_failed")
+        tryCatch(control(if (normal_exit) "_stopped" else "_failed"),
+                 error = function(e) message("Could not record worker exit: ", conditionMessage(e)))
     }, add = TRUE)
 
     run_task <- function(task) {
@@ -99,5 +130,5 @@ persistent_serve <- function(session, python = Sys.which("python"), initialize =
 
 if (sys.nframe() == 0L) {
     args <- commandArgs(trailingOnly = TRUE)
-    persistent_serve(args[1L], python = args[2L], initialize = TRUE)
+    persistent_serve(args[1L], python = args[2L], initialize = TRUE, script = worker_script())
 }

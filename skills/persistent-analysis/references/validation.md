@@ -77,6 +77,17 @@ At the user's request, the sbatch launcher and its submission/job-ID branches we
 
 Post-change validation: both real terminal launchers passed in 18.290 seconds. Five focused compute-node tests passed in 12.281 seconds: private-root/traversal safeguards, login-node worker refusal, rejection of the removed launcher before any registry/job setup, R initialization/persistence, and Python persistence across independent CLI calls. Official skill validation and shell syntax checks passed. The previously completed full suite below is historical; the expanded 25-test suite was not rerun in full for this launcher-only change. Installed runtime and repository source were updated together after confirming no active registered sessions.
 
+## Stale install path resilience — 2026-11-17
+
+A worker died when its install directory was removed externally, because `bridge.txt` recorded an absolute helper path and the R worker shelled out to it on every queue poll. Recorded paths are now repaired whenever they no longer resolve, and the R worker falls back to the helper beside its own script, with `$PERSISTENT_ANALYSIS_BRIDGE` as an explicit override and a diagnostic naming every checked path when none resolves.
+
+| Check | Observation |
+| --- | --- |
+| Recorded path repaired | A session whose `bridge.txt` named a removed install was repaired to the serving helper on the next command, with a notice on stderr, and kept running tasks |
+| R worker fallback | Sourcing `worker.R` with a stale recording and no override resolved the helper beside the script rather than failing |
+| Full compute-node suite | 27 tests passed in 158.763 seconds (one CPU/task, 2 GiB, fifteen-minute limit), including all R and Python worker, persistence, timeout, termination and synthetic-Seurat cases |
+| Live worker deploy check | The one active Python worker continued to report `ready` and executed a task after the installed helper was replaced and after `~/.codex` was removed |
+
 ## Historical baseline tests (before removing the batch launcher)
 
 | Check | Observation |
