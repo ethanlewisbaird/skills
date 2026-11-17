@@ -1,6 +1,6 @@
 ---
 name: single-cell-plot-style
-description: Apply Ethan's default colours and aesthetics when creating or editing single-cell feature plots, module-score maps, expression dotplots, and categorical maps (clusters, genotypes, samples, composition barplots). Preserve analysis-specific feature limits and use shared limits across genotype panels. Excludes enrichment dotplots and enrichment colour scales.
+description: Apply Ethan's default colours and aesthetics when creating or editing single-cell feature plots, module-score maps, expression dotplots, signed tile heatmaps, and categorical maps (clusters, genotypes, samples, composition barplots). Preserve analysis-specific feature limits and use shared limits across genotype panels. Excludes enrichment dotplots and enrichment colour scales.
 license: MIT
 ---
 
@@ -16,6 +16,11 @@ Seurat examples. Use the analysis's existing environment and report a missing
 dependency rather than substituting a palette.
 
 ## Feature plots and module-score maps
+
+Scope: these are embedding or spatial plots where cells or spots carry the colour,
+and single-feature maps of a score. The `matlab.like2`/`deeppink` palette is a
+**sequential** ramp for that use. It is not a heatmap palette; tile heatmaps of
+signed scores are covered below.
 
 - Apply `sc_feature_style()` to each feature/map panel. Its palette matches the
   reference's `cols`: the first 18 colours of `colorRamps::matlab.like2(20)`, then
@@ -45,6 +50,36 @@ plots <- lapply(plots, function(p) {
   p + sc_feature_style(limits = feature_limits)
 })
 ```
+
+## Tile heatmaps of signed scores
+
+A tile heatmap summarises many features across many samples or groups. Signed
+quantities — z-scores, group differences, centred module scores, log fold changes —
+need a scale anchored at zero, because the midpoint is the interpretation.
+
+- Use a **diverging** scale with a light neutral midpoint and symmetric limits, for
+  example `#3B4CC0` → `#F2F2F2` → `#B40426` with `oob = scales::squish`. Do not use
+  the feature palette or any sequential ramp (viridis, magma, blues): a sequential
+  ramp puts the neutral value at one end, so magnitude and direction cannot be read
+  separately.
+- Set `limits = c(-L, L)` from the displayed values taken together, and keep the
+  same pair across panels that share a feature. State whether rows are standardised
+  per feature; standardising changes the question from absolute level to relative
+  ordering.
+- Sequential scales remain correct for non-negative quantities: expression level,
+  fraction of expressing cells, accessibility counts.
+
+```r
+diverging_fill <- function(name, limit) {
+  scale_fill_gradient2(low = "#3B4CC0", mid = "#F2F2F2", high = "#B40426",
+                       midpoint = 0, limits = c(-limit, limit),
+                       oob = scales::squish, name = name)
+}
+```
+
+Keep legend encodings distinct: if shape already encodes a method, do not also
+draw a second legend with circles for a different aesthetic. Encode one variable
+per aesthetic, and drop a legend when the subtitle already explains it.
 
 ## Expression dotplots
 
