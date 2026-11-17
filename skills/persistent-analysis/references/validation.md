@@ -86,7 +86,9 @@ A worker died when its install directory was removed externally, because `bridge
 | Recorded path repaired | A session whose `bridge.txt` named a removed install was repaired to the serving helper on the next command, with a notice on stderr, and kept running tasks |
 | R worker fallback | Sourcing `worker.R` with a stale recording and no override resolved the helper beside the script rather than failing |
 | Full compute-node suite | 27 tests passed in 158.763 seconds (one CPU/task, 2 GiB, fifteen-minute limit), including all R and Python worker, persistence, timeout, termination and synthetic-Seurat cases |
-| Live worker deploy check | The one active Python worker continued to report `ready` and executed a task after the installed helper was replaced and after `~/.codex` was removed |
+| Removal of a live install path | An active Python worker completed a task after `~/.codex` was deleted and its recording repaired (2026-11-16); that worker later ended at its three-day walltime, unrelated to the change |
+| Replacing the helper under a live worker | An idle R worker, prepared from the shared checkout, claimed and completed a no-op task against the replaced helper (2026-11-17) |
+| Deployed copy | Protocol tests rerun from the installed tree: 5 passed, including the repair notice and the R fallback |
 
 ## Historical baseline tests (before removing the batch launcher)
 
