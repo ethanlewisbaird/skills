@@ -86,9 +86,23 @@ sample-count vector into a continuous scale, and do not reuse the feature palett
   as the corresponding map, so a category is the same colour in both.
 - Keep the reference's `theme_bw()` with rotated x labels for barplots and
   `theme_void()` for maps unless the analysis already sets something else.
+- Cluster maps label each cluster at its centroid and **omit the cluster legend**.
+  Use `sc_cluster_map()` for data-frame coordinates or `sc_dimplot_clusters()` for
+  Seurat. Label size 5; numeric clusters in numeric order; check that no label is
+  clipped or hidden. Keep a legend only for a non-labelled variable (sample,
+  genotype, condition); never duplicate cluster identity in a legend.
+- Sample/genotype maps keep their legend because the categories are not labelled
+  on the plot; do not add cluster numbers to those panels.
 
 ```r
-p + sc_category_style(n = 20, aesthetic = "colour", name = "Cluster")
+# Data-frame coordinates with cluster labels; no cluster legend.
+sc_cluster_map(coordinates, x = "UMAP_1", y = "UMAP_2", cluster = "cluster")
+
+# Seurat object; labelled clusters and no legend.
+sc_dimplot_clusters(seu, group.by = "harmony_snn_res.0.8")
+
+# Composition barplot keeps the palette but the legend is appropriate here.
+p + sc_category_style(n = 20, aesthetic = "fill", name = "Cluster")
 ```
 
 ## Export and reproducibility
