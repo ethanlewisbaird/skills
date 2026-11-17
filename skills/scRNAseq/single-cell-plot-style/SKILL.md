@@ -1,6 +1,6 @@
 ---
 name: single-cell-plot-style
-description: Apply Ethan's default colours and aesthetics when creating or editing single-cell feature plots, module-score maps, and expression dotplots. Preserve analysis-specific feature limits and use shared limits across genotype panels. Excludes enrichment dotplots and categorical cluster palettes.
+description: Apply Ethan's default colours and aesthetics when creating or editing single-cell feature plots, module-score maps, expression dotplots, and categorical maps (clusters, genotypes, samples, composition barplots). Preserve analysis-specific feature limits and use shared limits across genotype panels. Excludes enrichment dotplots and enrichment colour scales.
 license: MIT
 ---
 
@@ -68,6 +68,27 @@ p <- Seurat::DotPlot(
   seu, features = features, dot.scale = 6,
   scale = TRUE, col.min = 0, col.max = 2.5
 ) + sc_dotplot_style(name = "Scaled average expression")
+```
+
+## Categorical maps and composition barplots
+
+Cluster, genotype, sample, phase and condition maps use `sc_category_palette()`,
+the reference script's `mycols*` vectors. They are categorical: do not pass a
+sample-count vector into a continuous scale, and do not reuse the feature palette.
+
+- One palette per categorical variable, reused across every figure in the
+  analysis, with the levels in a fixed documented order, so a cluster keeps its
+  colour between panels, samples and report revisions.
+- The reference maps colour by level order and never recycles; `sc_category_style()`
+  does the same. With more levels than colours, paginate panels or group rare
+  levels; recycling produces two clusters sharing a colour.
+- For stacked composition barplots use `aesthetic = "fill"` with the same palette
+  as the corresponding map, so a category is the same colour in both.
+- Keep the reference's `theme_bw()` with rotated x labels for barplots and
+  `theme_void()` for maps unless the analysis already sets something else.
+
+```r
+p + sc_category_style(n = 20, aesthetic = "colour", name = "Cluster")
 ```
 
 ## Export and reproducibility

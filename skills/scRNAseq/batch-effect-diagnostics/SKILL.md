@@ -70,6 +70,11 @@ decision, and a compact methods/limitations note in the existing analysis
 narrative. Do not choose integration, regression, PC count or a final partition
 inside this skill: present the evidence and let Ethan decide.
 
+The diagnosis decides only what the structure is. Choosing a remedy, fitting it and
+comparing models is **scrna-integration**; hand it the D1–D5 tables so its before
+and after columns are the same quantities. For molecules rather than structure,
+ambient removal is **ambient-rna-removal**.
+
 Detailed formulas, thresholds and pitfalls: [diagnostics](references/diagnostics.md).
 Configuration scaffold: [config_template.R](assets/config_template.R).
 

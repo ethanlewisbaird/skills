@@ -1,6 +1,6 @@
 ---
 name: seurat-qc-clustering
-description: "Interactive Seurat QC and clustering on Slurm: import public expression matrices or Cell Ranger data, align arbitrary sample/cell metadata, preview dataset-specific QC, detect doublets by capture, compare clustering settings, curate clusters and resume checkpoints in persistent R. Use for scRNA-seq QC, PCA/UMAP, cluster exploration and marker reporting; integration and condition-level inference are separate workflows."
+description: "Interactive Seurat QC and clustering on Slurm: import public expression matrices or Cell Ranger data, align arbitrary sample/cell metadata, preview dataset-specific QC, detect and revise doublets by capture, compare clustering settings, curate clusters, recluster a subset, and resume checkpoints in persistent R. Use for scRNA-seq QC, PCA/UMAP, cluster exploration and marker reporting; integration and condition-level inference are separate workflows."
 ---
 
 # Seurat QC and clustering
@@ -72,6 +72,9 @@ the relevant stage, including concrete API examples and stage-specific checks.
   method-specific calls as flagged metadata. A low or high call rate is not evidence
   that the calls are correct. Missing capture identity blocks this stage, not
   independent QC inspection. Do not invent capture IDs or bypass a detection failure.
+  When the first pass needs revising, follow
+  [consensus doublet revision](references/subset_and_doublet_revision.md#consensus-doublet-revision)
+  to keep the baseline calls, agree a consensus rule and validate the retained set.
 - **Project-specific modeling.** Choose SCT versus log processing and explicitly pin
   SCT flavor. Cell-cycle scoring and regression follow the scientific aim: retaining
   biological state versus reducing cycle heterogeneity for cell-type analysis.
@@ -104,6 +107,13 @@ the relevant stage, including concrete API examples and stage-specific checks.
   dataset dependent. Bind decisions to the current `partition_id`, use named
   mappings, preserve prior labels, and document reasons. Never transfer a numeric
   cluster ID from another run. Regenerate affected markers and figures afterward.
+- **Recluster a subset.** When the next question concerns one population, one
+  genotype or one state, follow
+  [subset reclustering](references/subset_and_doublet_revision.md#subset-reclustering):
+  state what the subset was selected on, decide whether to reuse the parent
+  normalization and embedding or refit, keep parent labels as metadata, and re-run
+  the PC/resolution choice for the new graph. Subset cluster IDs never transfer to
+  the parent, or from the parent.
 - **Preserve requested marker styling.** When creating or revising marker plots,
   read [marker plotting](references/marker_plotting.md) for selection, display
   settings and interpretation. Reuse loaded marker results for replots.
