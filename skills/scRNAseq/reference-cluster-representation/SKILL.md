@@ -83,7 +83,7 @@ Each row reports:
 - percentage-point difference and log2 enrichment with a pseudocount;
 - median top score and margin, and the fraction below the confidence floor;
 - marker concordance: detection difference and fraction of markers enriched;
-- query-cluster distribution: dominant cluster, purity and entropy;
+- dominant query cluster, with purity and entropy from the crosstab;
 - the verdict and the rule that produced it.
 
 Completion: one row per reference label per query sample, no label missing, every
