@@ -1,7 +1,7 @@
 ---
 name: samap-alignment
 license: MIT
-description: SAMap cross-species alignment of single-cell RNA-seq: prepare inputs, build or reuse the homology graph, fit per-species manifolds, score state-by-reference weights, and test reference-composition dependence. Refitting against a new reference, a new cell pool, or a different mapping policy triggers this skill. Differential expression, integration and bulk projection are separate analyses.
+description: SAMap cross-species alignment of single-cell RNA-seq: prepare inputs, build or reuse the homology graph, fit per-species manifolds, score state-by-reference weights, test reference-composition dependence and plot the joint UMAP. Refitting against a new reference, a new cell pool, a different mapping policy or a new projection triggers this skill. Differential expression, integration and bulk projection are separate analyses.
 ---
 
 # SAMap cross-species alignment
@@ -115,6 +115,24 @@ same-lineage normal tissue and, where available, non-neural malignant cells.
 
 Completion criterion: the sensitivity table spans the pre-specified settings, and the
 narrative states which conclusions survive and which depend on composition.
+
+## Optional: joint UMAP
+
+The joint graph supports a descriptive 2-D projection. Compute it from
+`obsp["connectivities"]` with SAMap's `run_umap()` or `sc.tl.umap`, colour once by
+species/reference role and once by query state, and save the coordinates so a recolour
+never needs a refit.
+
+State the initialisation in the caption. Spectral initialisation can fail on stitched
+graphs and fall back to random, and that fallback layout differs from an explicit random
+start. Identical settings reproduce exactly; compare settings with Procrustes
+correlation and 30-NN overlap against the accepted layout, varying `min_dist`, `maxiter`
+and `spread`, then name the one the figure uses. Keep per-library facets where library
+identity may matter. Read the layout as a projection; the weight and composition tables
+remain the evidence.
+
+Completion criterion: coordinates saved, initialisation and parameters stated, and the
+caption says the layout is a projection.
 
 ## 8. Verify and record
 
