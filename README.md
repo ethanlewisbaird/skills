@@ -58,23 +58,24 @@ Clone this repository to a location you control, then install the **whole skill 
 git clone https://github.com/ethanlewisbaird/skills.git "$HOME/skills"
 ```
 
-## Install and keep copies in sync
+## Install and keep skills in sync
 
 The repository is the source of truth, and hosts read skills from separate
-directories, so the copies drift silently: a corrected helper never reaches the
-host that loads it. `sync_skills.py` copies every skill here into each configured
-discovery root and reports per-skill state.
+directories, so an install step is required; linking rather than copying keeps one
+copy of every helper, reference and test. `sync_skills.py` links every skill here
+into each configured discovery root and reports per-skill state.
 
 ```bash
 cd "$HOME/skills"
-./sync_skills.py check      # same / differs / absent per root; no changes
-./sync_skills.py install    # replace stale copies, then report
+./sync_skills.py check                      # linked / stale-link / copy / absent
+./sync_skills.py install                    # create or repoint links
+./sync_skills.py install --replace-copies   # also replace real copies with links
 ```
 
-Roots are listed in the script and include `~/.agents/skills`, `~/.codex/skills`
-and `~/.config/opencode/skills`. Directories a root holds that this repository does
-not are reported as unmanaged and left alone. Runtime noise (`*.log`,
-`__pycache__`) is neither installed nor compared.
+Roots are listed in the script (`~/.agents/skills`, `~/.config/opencode/skills`).
+A real directory is left alone unless `--replace-copies` is given, so an older
+copy that holds local edits is not silently overwritten. Directories a root holds
+that this repository does not are reported as unmanaged and left alone.
 
 Choose one installation target:
 
