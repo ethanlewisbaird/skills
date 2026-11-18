@@ -173,8 +173,9 @@ Completion: counts per verdict and a sensitivity table.
 - Keep one shared scale within a figure. Do not rescale each panel separately.
 - Report composition distances in tables. A line plot of distances adds little;
   use per-label differences or a query-versus-matched scatter instead.
-- Avoid sample-wide score boxplots. If confidence needs a figure, show per-label
-  score distributions for the labels under discussion.
+- Report confidence in the representation table. Avoid sample-wide and per-label
+  score-distribution panels; use per-label differences, marker support or the
+  status scatter when a visual summary is needed.
 - `rr_plot_composition()`, `rr_plot_crosstab()`, `rr_plot_cluster_status()` and
   `rr_plot_marker_support()` implement these conventions.
 

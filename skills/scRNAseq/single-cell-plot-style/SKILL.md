@@ -1,6 +1,6 @@
 ---
 name: single-cell-plot-style
-description: Apply Ethan's default colours and aesthetics when creating or editing single-cell feature plots, module-score maps, expression dotplots, signed tile heatmaps, and categorical maps (clusters, genotypes, samples, composition barplots). Preserve analysis-specific feature limits and use shared limits across genotype panels. Excludes enrichment dotplots and enrichment colour scales.
+description: Apply Ethan's default colours and aesthetics when creating or editing single-cell feature plots, module-score maps, expression dotplots, tile heatmaps (signed or composition), and categorical maps (clusters, genotypes, samples, composition barplots). Preserve analysis-specific feature limits and use shared limits across genotype panels. Excludes enrichment dotplots and enrichment colour scales.
 license: MIT
 ---
 
@@ -80,6 +80,41 @@ diverging_fill <- function(name, limit) {
 Keep legend encodings distinct: if shape already encodes a method, do not also
 draw a second legend with circles for a different aesthetic. Encode one variable
 per aesthetic, and drop a legend when the subtitle already explains it.
+
+## Heatmaps: units, orientation and subtitles
+
+- Use **one unit per figure**. For composition or proportion heatmaps, use percent
+  (0–100) on both the fill scale and any printed value, and name the legend
+  `Percent of sample` or `Percent of query cluster`. Do not put fractions in the
+  legend and percentages in the tiles. Tables may keep fractions with explicit
+  `fraction_*` names.
+- Put the category with many levels on the y axis (reference labels, clusters,
+  features); put samples, conditions or query clusters on x. Keep a fixed natural
+  order: numeric clusters numerically, not lexicographically.
+- Add a one-line subtitle under the title stating the denominator and what the
+  figure shows. Examples: `Percent of each sample's cells assigned to each
+  reference label; columns sum to 100%` and `Percent of each query cluster's cells
+  assigned to each reference label; query-cluster columns sum to 100%`.
+- In dense heatmaps, print values only above a threshold such as 20%; the printed
+  value must use the same unit as the fill.
+- Signed difference heatmaps use percentage points, a diverging scale anchored at
+  zero, and a subtitle naming the baseline and sign convention, for example
+  `May minus flp in percentage points; positive means enriched in May`.
+- Keep one scale within a figure. Do not rescale each panel separately; if panels
+  use different denominators, use a separate figure or a shared scale covering all
+  panels.
+
+```r
+# Percent composition heatmap: one unit, categories on y, subtitle states denominator.
+ggplot(long, aes(sample, reference_label, fill = percent)) +
+  geom_tile() +
+  geom_text(aes(label = ifelse(percent >= 0.5, sprintf("%.0f", percent), "")),
+            size = 2.2) +
+  scale_fill_gradient(low = "#f7f7f7", high = "#08519c") +
+  labs(title = "Reference-label composition",
+       subtitle = "Percent of each sample's cells assigned to each reference label; columns sum to 100%.",
+       x = NULL, y = "Reference label", fill = "Percent of sample")
+```
 
 ## Expression dotplots
 
