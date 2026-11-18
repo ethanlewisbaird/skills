@@ -28,6 +28,10 @@ Source `scripts/reference_representation.R` first, then `scripts/cell_figures.R`
 Select up to 10 validated markers per reference cluster, ranked by query detection
 difference. Use original RNA counts, not SCT residuals.
 
+A reference cluster with no validated markers contributes no rows; one with a
+single validated marker contributes one row. Do not fill the gap with unvalidated
+whole-reference markers without labelling them as descriptive.
+
 ## Cell marker heatmap
 
 ```r
