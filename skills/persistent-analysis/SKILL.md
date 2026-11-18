@@ -8,6 +8,19 @@ license: MIT
 
 Keep the interpreter and its loaded objects, not just the terminal. The CLI is `bin/persistent-analysis` relative to this skill directory; resolve that path rather than assuming PATH installation. Even object inventory submits a queue task, so execution needs write access to both the private registry and project; a read-only sandbox can check status. Report missing access rather than bypassing host permissions.
 
+## Hard gate: no silent one-shot fallback
+
+Any script that loads a research object or writes derived analysis results must run
+in a verified persistent session. If the suitable worker is terminated, stale or
+unavailable, stop and follow the recovery/setup path. Do not substitute
+`Rscript`/`python` one-shot execution for the same work; worker absence is not an
+override. Explicit user approval is required for a one-shot large-object analysis.
+
+A stage is complete only when its run record names the persistent session and
+Slurm job. An empty session or job ID means incomplete provenance: rerun under the
+worker and replace the record. File/report utilities that never load research
+objects are exempt, with the exemption stated.
+
 ## Select the interpreter before loading
 
 For plotting, exploration or iterative analysis of large R/Python objects, complete this sequence **before writing/running a script that loads the object**. Handle the commands yourself; the user should not need a setup tutorial.
