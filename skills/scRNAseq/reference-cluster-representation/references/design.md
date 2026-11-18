@@ -106,6 +106,41 @@ reference label can be split across query clusters, or several reference labels
 can merge into one query cluster. Report both directions. Do not choose a query
 partition inside this assessment unless the analysis question requires one.
 
+### Merges
+
+A query cluster that spans two reference labels is a merge, not an error. The
+per-cell composition table still estimates both labels; the crosstab records that
+the query partition did not separate them. If the merge is caused by resolution,
+compare a finer partition. If the two reference labels are arbitrary splits of a
+continuum, the merge is the more honest description. The skill does not force a
+one-to-one mapping.
+
+### Query-cluster status
+
+`rr_query_cluster_status()` separates four outcomes:
+
+- `reference_dominated`: one reference label accounts for at least 0.7 of the
+  cluster, with adequate score and marker support.
+- `mixed_reference`: at least two labels each account for at least 0.2.
+- `unresolved`: low score, weak marker support, or neither a dominant nor a mixed
+  pair.
+- `not_explained_by_reference`: purity below 0.5 with a low score. This is a flag
+  for a state the reference does not explain, not evidence that the cluster is
+  novel.
+
+`rr_reference_label_split()` reports whether a reference label is concentrated in
+one query cluster (at least 0.7 of its cells), split (two clusters each at least
+0.2), or diffuse.
+
+### Novelty
+
+Label transfer cannot prove novelty. A genuinely new state that resembles one
+reference label can transfer with a high score and pass a marker gate. A
+`not_explained_by_reference` result says only that the reference is a poor
+explanation. A novelty claim needs marker coherence, separation from reference
+cells in a joint representation, and ideally a reference-free or cross-dataset
+comparison. Keep that analysis separate from this skill.
+
 ## Common failure modes
 
 | Symptom | Likely cause | Check |

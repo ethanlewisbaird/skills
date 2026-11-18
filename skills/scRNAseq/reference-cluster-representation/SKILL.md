@@ -94,13 +94,36 @@ verdict traceable to its rule.
 
 ```r
 ct <- rr_cluster_crosstab(predictions, query_cluster)
+status <- rr_query_cluster_status(predictions, query_cluster,
+  markers = markers, counts = query_counts)
+split <- rr_reference_label_split(predictions, query_cluster)
 ```
 
 Report the query cluster by reference label table, row purity and dominant label.
 Flag splits (one reference label spread across several query clusters) and merges
 (one query cluster spanning several reference labels).
 
-Completion: every query cluster is accounted for and splits/merges are named.
+`rr_query_cluster_status()` labels each query cluster:
+
+| Status | Rule |
+|---|---|
+| `reference_dominated` | purity >= 0.7, median top score >= 0.5, marker gate passes where assessed |
+| `mixed_reference` | at least two labels each >= 0.2, score gate passes |
+| `unresolved` | low score, weak marker support, or no dominant/mixed pair |
+| `not_explained_by_reference` | purity < 0.5 and low score; a flag, not proof of novelty |
+| `limited_cluster` | fewer than 10 cells |
+
+`rr_reference_label_split()` labels each reference label: `single_cluster` when one
+query cluster holds >= 0.7 of the label's cells, `split` when two clusters each hold
+>= 0.2, `diffuse` otherwise, and `limited_reference` below 10 cells.
+
+These statuses are diagnostic. They do not feed back into the per-reference-label
+verdicts, and a `not_explained_by_reference` cluster is not a new cell state.
+Novelty needs marker coherence, separation from reference cells and an independent
+comparison.
+
+Completion: every query cluster has a status, every reference label has a split
+status, and any merge or diffuse cluster is named.
 
 ## 6. Matched composition comparison
 

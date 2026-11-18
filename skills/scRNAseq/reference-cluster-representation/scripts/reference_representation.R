@@ -332,9 +332,117 @@ rr_plot_crosstab <- function(crosstab) {
     ggplot2::labs(x = "Reference label", y = "Query cluster", fill = "Fraction")
 }
 
-rr_plot_scores <- function(predictions, group = "sample", score = "top_score") {
-  if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
-  ggplot2::ggplot(predictions, ggplot2::aes(.data[[group]], .data[[score]])) +
-    ggplot2::geom_boxplot(outlier.size = 0.3) + ggplot2::theme_bw(base_size = 11) +
-    ggplot2::labs(x = NULL, y = "Top label score")
+rr_query_cluster_status <- function(predictions, cluster, markers = NULL, counts = NULL,
+                                    prediction_label = "predicted_label",
+                                    rules = list()) {
+  defaults <- list(min_cells = 10L, material_fraction = 0.1,
+    purity_high = 0.7, mixed_fraction = 0.2,
+    min_median_score = 0.5, min_marker_fraction = 0.5,
+    min_marker_delta = 0.1)
+  rules <- utils::modifyList(defaults, rules)
+  rr_require_columns(predictions, c("cell", prediction_label, "top_score"), "predictions")
+  cluster <- rr_align(cluster, predictions$cell, "cluster")
+  labels <- rr_sort_labels(predictions[[prediction_label]])
+  clusters <- rr_sort_labels(cluster)
+  use_markers <- !is.null(markers) && !is.null(counts)
+  if (use_markers) {
+    rr_require_columns(markers, c("label", "gene"), "markers")
+    if (!inherits(counts, "matrix") && !inherits(counts, "Matrix")) stop("counts must be a matrix.")
+    if (!all(predictions$cell %in% colnames(counts))) stop("counts is missing prediction cells.")
+  }
+  out <- do.call(rbind, lapply(clusters, function(cl) {
+    ix <- which(cluster == cl)
+    frac <- table(factor(predictions[[prediction_label]][ix], levels = labels)) / length(ix)
+    ord <- order(frac, decreasing = TRUE)
+    dominant <- labels[ord[1]]
+    purity <- as.numeric(frac[ord[1]])
+    second_label <- if (length(labels) > 1) labels[ord[2]] else NA_character_
+    second_fraction <- if (length(labels) > 1) as.numeric(frac[ord[2]]) else 0
+    material <- frac[frac > 0]
+    entropy <- if (length(material) > 1) -sum(material * log2(material)) / log2(length(labels)) else 0
+    score <- stats::median(predictions$top_score[ix])
+    margin <- if ("margin" %in% names(predictions)) stats::median(predictions$margin[ix]) else NA_real_
+    marker_fraction <- NA_real_
+    n_markers <- NA_integer_
+    if (use_markers) {
+      genes <- unique(as.character(markers$gene[as.character(markers$label) == dominant]))
+      genes <- intersect(genes, rownames(counts))
+      other <- setdiff(predictions$cell, predictions$cell[ix])
+      if (length(genes) && length(other)) {
+        det_own <- Matrix::rowMeans(counts[genes, predictions$cell[ix], drop = FALSE] > 0)
+        det_other <- Matrix::rowMeans(counts[genes, other, drop = FALSE] > 0)
+        d <- as.numeric(det_own - det_other)
+        n_markers <- length(genes)
+        marker_fraction <- mean(d >= rules$min_marker_delta)
+      }
+    }
+    status <- if (length(ix) < rules$min_cells) {
+      "limited_cluster"
+    } else if (score < rules$min_median_score && purity < 0.5) {
+      "not_explained_by_reference"
+    } else if (score < rules$min_median_score ||
+               (!is.na(marker_fraction) && marker_fraction < rules$min_marker_fraction)) {
+      "unresolved"
+    } else if (purity >= rules$purity_high) {
+      "reference_dominated"
+    } else if (second_fraction >= rules$mixed_fraction) {
+      "mixed_reference"
+    } else {
+      "unresolved"
+    }
+    reason <- switch(status,
+      limited_cluster = paste("fewer than", rules$min_cells, "cells"),
+      not_explained_by_reference = "diffuse assignment with low score",
+      unresolved = if (score < rules$min_median_score) "low median score" else
+        "weak marker support or no dominant pair",
+      reference_dominated = paste("label", dominant, "at", round(purity, 2)),
+      mixed_reference = paste("labels", dominant, "and", second_label, "at",
+        round(purity, 2), "and", round(second_fraction, 2)))
+    data.frame(cluster = cl, cells = length(ix), dominant_label = dominant,
+      purity = purity, second_label = second_label, second_fraction = second_fraction,
+      n_labels_material = sum(frac >= rules$material_fraction), entropy = entropy,
+      median_top_score = score, median_margin = margin, n_markers = n_markers,
+      fraction_markers_enriched = marker_fraction, status = status,
+      reason = reason, stringsAsFactors = FALSE)
+  }))
+  rownames(out) <- NULL
+  attr(out, "rules") <- rules
+  out
+}
+
+rr_reference_label_split <- function(predictions, cluster,
+                                     prediction_label = "predicted_label",
+                                     rules = list()) {
+  defaults <- list(min_cells = 10L, material_fraction = 0.1,
+    majority_fraction = 0.7, split_fraction = 0.2)
+  rules <- utils::modifyList(defaults, rules)
+  rr_require_columns(predictions, c("cell", prediction_label), "predictions")
+  cluster <- rr_align(cluster, predictions$cell, "cluster")
+  labels <- rr_sort_labels(predictions[[prediction_label]])
+  clusters <- rr_sort_labels(cluster)
+  out <- do.call(rbind, lapply(labels, function(lb) {
+    ix <- which(predictions[[prediction_label]] == lb)
+    if (!length(ix)) return(NULL)
+    share <- table(factor(cluster[ix], levels = clusters)) / length(ix)
+    ord <- order(share, decreasing = TRUE)
+    max_fraction <- as.numeric(share[ord[1]])
+    material <- clusters[share >= rules$material_fraction]
+    status <- if (length(ix) < rules$min_cells) {
+      "limited_reference"
+    } else if (max_fraction >= rules$majority_fraction) {
+      "single_cluster"
+    } else if (sum(share >= rules$split_fraction) >= 2) {
+      "split"
+    } else {
+      "diffuse"
+    }
+    data.frame(label = lb, query_cells = length(ix), n_clusters = sum(share > 0),
+      n_material_clusters = sum(share >= rules$material_fraction),
+      dominant_cluster = clusters[ord[1]], max_cluster_fraction = max_fraction,
+      material_clusters = paste(material, collapse = ";"), split_status = status,
+      stringsAsFactors = FALSE)
+  }))
+  rownames(out) <- NULL
+  attr(out, "rules") <- rules
+  out
 }

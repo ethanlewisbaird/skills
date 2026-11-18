@@ -102,8 +102,37 @@ stopifnot(verdict("L1", "Qmatch") == "supported",
 
 p1 <- rr_plot_composition(comp)
 p2 <- rr_plot_crosstab(ct)
-p3 <- rr_plot_scores(predictions)
-stopifnot(inherits(p1, "ggplot"), inherits(p2, "ggplot"), inherits(p3, "ggplot"))
+stopifnot(inherits(p1, "ggplot"), inherits(p2, "ggplot"))
+
+status <- rr_query_cluster_status(predictions, clusters)
+stopifnot(all(status$status %in% c("reference_dominated", "mixed_reference",
+  "unresolved", "not_explained_by_reference", "limited_cluster")),
+  status$status[status$cluster == "c_L1"] == "reference_dominated")
+
+merged <- clusters
+merged[clusters %in% c("c_L1", "c_L2")] <- "merged"
+merged_status <- rr_query_cluster_status(predictions, merged)
+stopifnot(merged_status$status[merged_status$cluster == "merged"] == "mixed_reference")
+
+diffuse <- clusters
+diffuse[clusters %in% c("c_L1", "c_L2", "c_L3")] <- "diffuse"
+low_predictions <- predictions
+low_predictions$top_score[diffuse == "diffuse"] <- 0.2
+diffuse_status <- rr_query_cluster_status(low_predictions, diffuse)
+stopifnot(diffuse_status$status[diffuse_status$cluster == "diffuse"] ==
+  "not_explained_by_reference")
+
+split <- rr_reference_label_split(predictions, clusters)
+stopifnot(split$split_status[split$label == "L1"] == "single_cluster")
+split_clusters <- clusters
+ix <- which(clusters == "c_L1")
+split_clusters[ix[seq_len(ceiling(0.6 * length(ix)))]] <- "other"
+split2 <- rr_reference_label_split(predictions, split_clusters)
+stopifnot(split2$split_status[split2$label == "L1"] == "split")
+
+marker_status <- rr_query_cluster_status(predictions, clusters,
+  markers = markers, counts = counts)
+stopifnot(any(!is.na(marker_status$fraction_markers_enriched)))
 
 duplicated_predictions <- rbind(predictions, predictions[1, ])
 duplicated_predictions$cell[nrow(duplicated_predictions)] <- duplicated_predictions$cell[1]
@@ -118,5 +147,6 @@ unknown$predicted_label[1] <- "L9"
 stopifnot(inherits(try(rr_composition(unknown, reference, "flp", "gal"), silent = TRUE), "try-error"))
 
 cat("PASS: design accounting, composition distance, marker concordance, crosstab purity and verdicts\n")
+cat("PASS: query-cluster status, merge and not-explained flags; reference-label split status\n")
 cat("PASS: duplicate cells, shuffled reference order and unknown labels checked\n")
 cat("ALL REFERENCE-REPRESENTATION TESTS PASSED\n")
