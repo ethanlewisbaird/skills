@@ -7,7 +7,7 @@ Two cell-level figures are accepted:
 
 Both use:
 
-- rows: up to 20 markers per reference cluster, grouped by reference cluster;
+- rows: up to 10 markers per reference cluster, grouped by reference cluster;
 - columns: individual cells, split by **query cluster**;
 - top annotation: reference label, sample and top-score bin.
 
@@ -32,7 +32,7 @@ Use either panel, and say which:
   can omit labels with no consistent gene.
 - **whole-reference** markers are the top markers from the reference all-markers
   table. They are descriptive, not Flp-validated, and can fill labels that lack a
-  validated panel. `rr_top_reference_markers(markers, top_n = 20, p_adj = 0.05,
+  validated panel. `rr_top_reference_markers(markers, top_n = 10, p_adj = 0.05,
   min_pct = 0.25, min_diff = 0.05)` assigns each gene to one cluster so the panel
   can reach 20 per cluster when candidates allow.
 

@@ -4,7 +4,7 @@
 
 
 
-rr_top_reference_markers <- function(markers, top_n = 20L, p_adj = 0.05,
+rr_top_reference_markers <- function(markers, top_n = 10L, p_adj = 0.05,
                                      min_pct = 0.25, min_diff = 0.05) {
   rr_require_columns(markers,
     c("cluster", "gene", "p_val_adj", "pct.1", "pct.2", "avg_log2FC"), "markers")
