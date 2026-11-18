@@ -161,27 +161,50 @@ Report threshold sensitivity. A single threshold is not a biological boundary.
 
 Completion: counts per verdict and a sensitivity table.
 
+## Accepted figure set
+
+The accepted reference-representation figures are:
+
+1. reference-label composition heatmap;
+2. query-cluster crosstab heatmap;
+3. reference projection;
+4. query versus matched composition scatter;
+5. composition difference dotplot;
+6. validated-marker support dotplot;
+7. query-cluster status scatter;
+8. query-to-reference alluvial;
+9. age-specific difference heatmap;
+10. cell marker heatmap;
+11. cell detection heatmap.
+
+Functions and recipes are in [references/figure_recipes.md](references/figure_recipes.md).
+The plotting helpers are `rr_plot_composition()`, `rr_plot_crosstab()`,
+`rr_plot_projection()`, `rr_plot_query_vs_matched()`, `rr_plot_difference()`,
+`rr_plot_marker_support()`, `rr_plot_cluster_status()`, `rr_plot_alluvial()` and
+`rr_plot_age_difference()`. The two cell heatmaps use
+[references/cell_figures.md](references/cell_figures.md).
+
 ## Cell-level figures
 
-When cluster-level summaries hide the evidence, use the accepted cell-level views:
+Two cell-level heatmaps are accepted:
 
-1. annotated marker heatmap (cells by reference label, validated markers);
-2. label-score heatmap (cells by the 16 reference labels);
-3. confidence maps (top score, margin, entropy);
-4. nearest-reference-neighbour agreement;
-5. marker score versus top label score;
-6. binary detection heatmap.
+1. cell marker heatmap (log-normalised expression, z-scored per gene);
+2. cell detection heatmap (binary detection).
+
+Use up to 10 validated markers per reference cluster as rows, grouped by reference
+cluster. Use individual cells as columns, split by **query cluster**. Add top
+annotations for reference label, sample and top-score bin. This keeps reference
+clusters as row groups and query clusters as column groups rather than repeating
+reference clusters on both axes.
 
 Source `scripts/reference_representation.R` then `scripts/cell_figures.R`.
-`rr_cell_confidence()`, `rr_knn_label_agreement()`, `rr_cell_marker_score()`,
-`rr_select_cells()` and `rr_marker_display_matrices()` compute the per-cell
-metrics; `rr_plot_confidence_maps()` and `rr_plot_marker_vs_score()` plot them.
-Complete ComplexHeatmap recipes are in [references/cell_figures.md](references/cell_figures.md).
+`rr_select_cells()` samples cells stratified by query cluster and sample;
+`rr_marker_display_matrices()` returns the z-scored and binary matrices. Complete
+ComplexHeatmap recipes are in [references/cell_figures.md](references/cell_figures.md).
 
-Use original log-normalised RNA counts, not SCT residuals. Downsample cells for
-display with a recorded seed. Cells are not biological replicates. The kNN
-agreement uses the reference embedding, so it supports rather than independently
-validates the mapping. State that markers may overlap mapping features.
+Use original log-normalised RNA counts, not SCT residuals. Downsample cells with a
+recorded seed. Cells are not biological replicates. Markers may overlap mapping
+features.
 
 ## 8. Figure conventions
 
@@ -223,6 +246,7 @@ or `orthologue-coverage`.
 ```bash
 Rscript --vanilla tests/test_reference_representation.R
 Rscript --vanilla tests/test_cell_figures.R
+Rscript --vanilla tests/test_figure_recipes.R
 ```
 
 The synthetic fixture has shared, shifted, low-confidence and absent labels. It
