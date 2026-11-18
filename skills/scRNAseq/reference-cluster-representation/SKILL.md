@@ -161,6 +161,28 @@ Report threshold sensitivity. A single threshold is not a biological boundary.
 
 Completion: counts per verdict and a sensitivity table.
 
+## Cell-level figures
+
+When cluster-level summaries hide the evidence, use the accepted cell-level views:
+
+1. annotated marker heatmap (cells by reference label, validated markers);
+2. label-score heatmap (cells by the 16 reference labels);
+3. confidence maps (top score, margin, entropy);
+4. nearest-reference-neighbour agreement;
+5. marker score versus top label score;
+6. binary detection heatmap.
+
+Source `scripts/reference_representation.R` then `scripts/cell_figures.R`.
+`rr_cell_confidence()`, `rr_knn_label_agreement()`, `rr_cell_marker_score()`,
+`rr_select_cells()` and `rr_marker_display_matrices()` compute the per-cell
+metrics; `rr_plot_confidence_maps()` and `rr_plot_marker_vs_score()` plot them.
+Complete ComplexHeatmap recipes are in [references/cell_figures.md](references/cell_figures.md).
+
+Use original log-normalised RNA counts, not SCT residuals. Downsample cells for
+display with a recorded seed. Cells are not biological replicates. The kNN
+agreement uses the reference embedding, so it supports rather than independently
+validates the mapping. State that markers may overlap mapping features.
+
 ## 8. Figure conventions
 
 - Put reference labels on the y axis in every heatmap.
@@ -200,6 +222,7 @@ or `orthologue-coverage`.
 
 ```bash
 Rscript --vanilla tests/test_reference_representation.R
+Rscript --vanilla tests/test_cell_figures.R
 ```
 
 The synthetic fixture has shared, shifted, low-confidence and absent labels. It
