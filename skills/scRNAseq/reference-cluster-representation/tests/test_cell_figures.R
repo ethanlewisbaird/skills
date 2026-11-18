@@ -20,6 +20,11 @@ predictions <- data.frame(cell = cells,
 markers <- data.frame(label = c("A", "A", "B", "B"),
   gene = c("M1", "M2", "M3", "M4"), stringsAsFactors = FALSE)
 
+groups <- data.frame(label = c("0", "1"), flp = c(80, 20), gal = c(20, 80))
+group_pct <- rr_reference_group_percent(groups)
+stopifnot(abs(group_pct$flp_percent[1] - 80) < 1e-8,
+  grepl("flp 80% / gal 20%", group_pct$row_title[1]))
+
 selected <- rr_select_cells(predictions, group_cols = c("query_cluster", "sample"),
   n_per_group = 2, seed = 1)
 stopifnot(nrow(selected) == 6,

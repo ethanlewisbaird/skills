@@ -7,8 +7,7 @@ Two cell-level figures are accepted:
 
 Both use:
 
-- rows: up to 10 validated markers per reference cluster, grouped by reference
-  cluster;
+- rows: up to 10 markers per reference cluster, grouped by reference cluster;
 - columns: individual cells, split by **query cluster**;
 - top annotation: reference label, sample and top-score bin.
 
@@ -24,13 +23,19 @@ Source `scripts/reference_representation.R` first, then `scripts/cell_figures.R`
   recorded seed.
 - `rr_marker_display_matrices()` returns the z-scored and binary matrices from
   original log-normalised RNA counts.
+- `rr_reference_group_percent()` converts reference flp/gal counts to percentages
+  and row titles.
 
-Select up to 10 validated markers per reference cluster, ranked by query detection
-difference. Use original RNA counts, not SCT residuals.
+Use either panel, and say which:
 
-A reference cluster with no validated markers contributes no rows; one with a
-single validated marker contributes one row. Do not fill the gap with unvalidated
-whole-reference markers without labelling them as descriptive.
+- **validated** markers are the Flp-consistent panel used by the verdicts. They
+  can omit labels with no consistent gene.
+- **whole-reference** markers are the top markers from the reference all-markers
+  table. They are descriptive, not Flp-validated, and can fill labels that lack a
+  validated panel.
+
+Use original RNA counts, not SCT residuals. Do not mix the two panels in one
+figure without labelling the difference.
 
 ## Cell marker heatmap
 
@@ -42,6 +47,8 @@ display <- rr_marker_display_matrices(counts, selected_cells, markers,
   library_sizes = Matrix::colSums(counts))
 annot <- annotation[match(display$cells, annotation$cell), ]
 marker_rows <- markers[match(display$genes, markers$gene), ]
+group_pct <- rr_reference_group_percent(reference_counts)
+row_titles <- group_pct$row_title[match(labels, group_pct$label)]
 
 top <- HeatmapAnnotation(
   reference = factor(annot$predicted_label, levels = labels),
@@ -57,8 +64,8 @@ Heatmap(display$z, name = "z-score",
   top_annotation = top,
   col = colorRamp2(c(-2.5, 0, 2.5), c("#2166ac", "white", "#b2182b")),
   show_column_names = FALSE, cluster_columns = FALSE, cluster_rows = FALSE,
-  row_names_side = "left",
-  column_title = query_clusters, row_title = labels,
+  row_names_side = "right", row_title_side = "left", row_title_rot = 0,
+  column_title = query_clusters, row_title = row_titles,
   heatmap_legend_param = list(at = c(-2.5, 0, 2.5)))
 ```
 
@@ -73,12 +80,14 @@ Heatmap(display$detection, name = "Detected",
   top_annotation = top,
   col = c("white", "#08519c"),
   show_column_names = FALSE, cluster_columns = FALSE, cluster_rows = FALSE,
-  row_names_side = "left",
-  column_title = query_clusters, row_title = labels)
+  row_names_side = "right", row_title_side = "left", row_title_rot = 0,
+  column_title = query_clusters, row_title = row_titles)
 ```
 
 ## Reporting
 
-Report the cell sample, marker panel and seed. Cells are not biological
-replicates. The heatmaps show relative expression or detection, not abundance.
-Markers may overlap the mapping features.
+Report the cell sample, marker panel and seed. State whether the panel is
+Flp-validated or whole-reference descriptive. Row titles show each reference
+cluster's flp/gal percentage. Cells are not biological replicates. The heatmaps
+show relative expression or detection, not abundance. Markers may overlap the
+mapping features.

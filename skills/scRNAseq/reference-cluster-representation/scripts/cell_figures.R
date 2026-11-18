@@ -2,6 +2,20 @@
 # Expression/detection matrices are plotted with ComplexHeatmap recipes in
 # references/cell_figures.md.
 
+
+rr_reference_group_percent <- function(reference_counts, label = "label",
+                                       flp = "flp", gal = "gal") {
+  rr_require_columns(reference_counts, c(label, flp, gal), "reference_counts")
+  total <- reference_counts[[flp]] + reference_counts[[gal]]
+  flp_pct <- 100 * reference_counts[[flp]] / pmax(total, 1)
+  gal_pct <- 100 * reference_counts[[gal]] / pmax(total, 1)
+  data.frame(label = as.character(reference_counts[[label]]),
+    flp_percent = flp_pct, gal_percent = gal_pct,
+    row_title = sprintf("%s: flp %.0f%% / gal %.0f%%",
+      as.character(reference_counts[[label]]), flp_pct, gal_pct),
+    stringsAsFactors = FALSE)
+}
+
 rr_select_cells <- function(predictions, group_cols = c("predicted_label", "sample"),
                             n_per_group = 20L, seed = 1448145L) {
   rr_require_columns(predictions, c("cell", group_cols), "predictions")

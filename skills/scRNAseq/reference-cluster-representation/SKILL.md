@@ -191,15 +191,19 @@ Two cell-level heatmaps are accepted:
 1. cell marker heatmap (log-normalised expression, z-scored per gene);
 2. cell detection heatmap (binary detection).
 
-Use up to 10 validated markers per reference cluster as rows, grouped by reference
-cluster. Use individual cells as columns, split by **query cluster**. Add top
-annotations for reference label, sample and top-score bin. This keeps reference
-clusters as row groups and query clusters as column groups rather than repeating
-reference clusters on both axes.
+Use up to 10 markers per reference cluster as rows, grouped by reference cluster.
+Use either the validated Flp-consistent panel (the verdict gate) or the
+whole-reference top-marker panel (descriptive, not Flp-validated); say which. Use
+individual cells as columns, split by **query cluster**. Add top annotations for
+reference label, sample and top-score bin. Row titles can carry each reference
+cluster's flp/gal percentage from `rr_reference_group_percent()`. This keeps
+reference clusters as row groups and query clusters as column groups rather than
+repeating reference clusters on both axes.
 
 Source `scripts/reference_representation.R` then `scripts/cell_figures.R`.
 `rr_select_cells()` samples cells stratified by query cluster and sample;
-`rr_marker_display_matrices()` returns the z-scored and binary matrices. Complete
+`rr_marker_display_matrices()` returns the z-scored and binary matrices;
+`rr_reference_group_percent()` returns the flp/gal row titles. Complete
 ComplexHeatmap recipes are in [references/cell_figures.md](references/cell_figures.md).
 
 Use original log-normalised RNA counts, not SCT residuals. Downsample cells with a
