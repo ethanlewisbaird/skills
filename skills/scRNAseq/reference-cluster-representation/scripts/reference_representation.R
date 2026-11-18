@@ -372,17 +372,18 @@ rr_plot_cluster_status <- function(status,
 
 rr_plot_marker_support <- function(markers,
                                    title = "Validated-marker support",
-                                   subtitle = "Dot size: fraction of validated markers enriched (at least 10 pp); colour: mean detection difference.") {
+                                   subtitle = "Dot size: percent of validated markers enriched (at least 10 pp); colour: mean detection difference.") {
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
+  markers$percent_enriched <- 100 * markers$fraction_enriched
   markers$label <- factor(markers$label, levels = rr_sort_labels(markers$label))
-  ggplot2::ggplot(markers, ggplot2::aes(scope, label, size = fraction_enriched,
+  ggplot2::ggplot(markers, ggplot2::aes(scope, label, size = percent_enriched,
     colour = mean_delta)) +
     ggplot2::geom_point() +
-    ggplot2::scale_size_area(max_size = 5, limits = c(0, 1)) +
+    ggplot2::scale_size_area(max_size = 5, limits = c(0, 100)) +
     ggplot2::scale_colour_gradient(low = "grey85", high = "forestgreen") +
     ggplot2::theme_bw(base_size = 11) +
     ggplot2::labs(title = title, subtitle = subtitle, x = NULL,
-      y = "Reference label", size = "Fraction enriched", colour = "Mean delta")
+      y = "Reference label", size = "Percent enriched", colour = "Mean delta")
 }
 
 rr_query_cluster_status <- function(predictions, cluster, markers = NULL, counts = NULL,
