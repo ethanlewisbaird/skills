@@ -102,7 +102,9 @@ stopifnot(verdict("L1", "Qmatch") == "supported",
 
 p1 <- rr_plot_composition(comp)
 p2 <- rr_plot_crosstab(ct)
-stopifnot(inherits(p1, "ggplot"), inherits(p2, "ggplot"))
+stopifnot(inherits(p1, "ggplot"), inherits(p2, "ggplot"),
+  max(p1$data$percent) <= 100, max(p1$data$percent) > 1,
+  max(p2$data$percent) <= 100, max(p2$data$percent) > 1)
 
 status <- rr_query_cluster_status(predictions, clusters)
 stopifnot(all(status$status %in% c("reference_dominated", "mixed_reference",
@@ -133,6 +135,9 @@ stopifnot(split2$split_status[split2$label == "L1"] == "split")
 marker_status <- rr_query_cluster_status(predictions, clusters,
   markers = markers, counts = counts)
 stopifnot(any(!is.na(marker_status$fraction_markers_enriched)))
+p3 <- rr_plot_cluster_status(status)
+p4 <- rr_plot_marker_support(mc)
+stopifnot(inherits(p3, "ggplot"), inherits(p4, "ggplot"))
 
 duplicated_predictions <- rbind(predictions, predictions[1, ])
 duplicated_predictions$cell[nrow(duplicated_predictions)] <- duplicated_predictions$cell[1]

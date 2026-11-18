@@ -300,36 +300,89 @@ rr_representation_table <- function(predictions, reference, matched_group,
   out
 }
 
-rr_plot_composition <- function(composition, value = "query_fractions") {
+rr_plot_composition <- function(composition, value = "query_fractions",
+                                title = "Reference-label composition",
+                                subtitle = "Percent of each sample's cells assigned to each reference label; columns sum to 100%.",
+                                show_values = TRUE) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
-  m <- composition[[value]]
+  m <- 100 * composition[[value]]
   long <- do.call(rbind, lapply(colnames(m), function(g) {
-    data.frame(label = rownames(m), group = g, fraction = m[, g],
+    data.frame(label = rownames(m), group = g, percent = m[, g],
       stringsAsFactors = FALSE)
   }))
   long$label <- factor(long$label, levels = rownames(m))
   long$group <- factor(long$group, levels = colnames(m))
-  ggplot2::ggplot(long, ggplot2::aes(group, label, fill = fraction)) +
+  p <- ggplot2::ggplot(long, ggplot2::aes(group, label, fill = percent)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient(low = "#f7f7f7", high = "#08519c") +
     ggplot2::theme_bw(base_size = 11) +
-    ggplot2::labs(x = NULL, y = "Reference label", fill = "Fraction")
+    ggplot2::labs(title = title, subtitle = subtitle, x = NULL,
+      y = "Reference label", fill = "Percent of sample")
+  if (show_values) {
+    p <- p + ggplot2::geom_text(ggplot2::aes(
+      label = ifelse(percent >= 0.5, sprintf("%.0f", percent), "")),
+      size = 2.2, colour = "black")
+  }
+  p
 }
 
-rr_plot_crosstab <- function(crosstab) {
+rr_plot_crosstab <- function(crosstab,
+                             title = "Query-cluster composition",
+                             subtitle = "Percent of each query cluster's cells assigned to each reference label; query-cluster columns sum to 100%.",
+                             show_values = FALSE, value_min = 20) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
   m <- crosstab$fractions
   long <- do.call(rbind, lapply(names(m)[-1], function(lb) {
-    data.frame(cluster = m$cluster, label = lb, fraction = m[[lb]],
+    data.frame(cluster = m$cluster, label = lb, percent = 100 * m[[lb]],
       stringsAsFactors = FALSE)
   }))
-  long$label <- factor(long$label, levels = names(m)[-1])
-  long$cluster <- factor(long$cluster, levels = m$cluster)
-  ggplot2::ggplot(long, ggplot2::aes(label, cluster, fill = fraction)) +
+  long$label <- factor(long$label, levels = rr_sort_labels(names(m)[-1]))
+  long$cluster <- factor(long$cluster, levels = rr_sort_labels(m$cluster))
+  p <- ggplot2::ggplot(long, ggplot2::aes(cluster, label, fill = percent)) +
     ggplot2::geom_tile() +
     ggplot2::scale_fill_gradient(low = "#f7f7f7", high = "#08519c") +
     ggplot2::theme_bw(base_size = 11) +
-    ggplot2::labs(x = "Reference label", y = "Query cluster", fill = "Fraction")
+    ggplot2::labs(title = title, subtitle = subtitle, x = "Query cluster",
+      y = "Reference label", fill = "Percent of query cluster")
+  if (show_values) {
+    p <- p + ggplot2::geom_text(ggplot2::aes(
+      label = ifelse(percent >= value_min, sprintf("%.0f", percent), "")),
+      size = 1.8, colour = "black")
+  }
+  p
+}
+
+rr_plot_cluster_status <- function(status,
+                                   title = "Query-cluster status",
+                                   subtitle = "Purity is the largest reference-label fraction in the cluster; dashed lines mark purity 0.7 and median score 0.5.") {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
+  if (!"partition" %in% names(status)) status$partition <- "all"
+  status$partition <- factor(status$partition, levels = unique(status$partition))
+  ggplot2::ggplot(status, ggplot2::aes(purity, median_top_score,
+    colour = status, size = cells)) +
+    ggplot2::geom_point(alpha = 0.85) +
+    ggplot2::geom_vline(xintercept = 0.7, linetype = 2, colour = "grey50") +
+    ggplot2::geom_hline(yintercept = 0.5, linetype = 2, colour = "grey50") +
+    ggplot2::scale_size_area(max_size = 4) +
+    ggplot2::facet_wrap(~partition) +
+    ggplot2::theme_bw(base_size = 11) +
+    ggplot2::labs(title = title, subtitle = subtitle, x = "Purity",
+      y = "Median top label score", colour = "Status", size = "Cells")
+}
+
+rr_plot_marker_support <- function(markers,
+                                   title = "Validated-marker support",
+                                   subtitle = "Dot size: fraction of validated markers enriched (at least 10 pp); colour: mean detection difference.") {
+  if (!requireNamespace("ggplot2", quietly = TRUE)) stop("Install ggplot2.")
+  markers$label <- factor(markers$label, levels = rr_sort_labels(markers$label))
+  ggplot2::ggplot(markers, ggplot2::aes(scope, label, size = fraction_enriched,
+    colour = mean_delta)) +
+    ggplot2::geom_point() +
+    ggplot2::scale_size_area(max_size = 5, limits = c(0, 1)) +
+    ggplot2::scale_colour_gradient(low = "grey85", high = "forestgreen") +
+    ggplot2::theme_bw(base_size = 11) +
+    ggplot2::labs(title = title, subtitle = subtitle, x = NULL,
+      y = "Reference label", size = "Fraction enriched", colour = "Mean delta")
 }
 
 rr_query_cluster_status <- function(predictions, cluster, markers = NULL, counts = NULL,

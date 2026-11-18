@@ -161,7 +161,24 @@ Report threshold sensitivity. A single threshold is not a biological boundary.
 
 Completion: counts per verdict and a sensitivity table.
 
-## 8. Report and hand over
+## 8. Figure conventions
+
+- Put reference labels on the y axis in every heatmap.
+- Use percent (0-100) on both the fill scale and any printed values. Do not mix
+  fractions in the legend with percentages in the tiles.
+- Put a one-line subtitle under the title stating the denominator and what the
+  figure shows. Examples: "Percent of each sample's cells assigned to each
+  reference label; columns sum to 100%" and "Percent of each query cluster's cells
+  assigned to each reference label; query-cluster columns sum to 100%."
+- Keep one shared scale within a figure. Do not rescale each panel separately.
+- Report composition distances in tables. A line plot of distances adds little;
+  use per-label differences or a query-versus-matched scatter instead.
+- Avoid sample-wide score boxplots. If confidence needs a figure, show per-label
+  score distributions for the labels under discussion.
+- `rr_plot_composition()`, `rr_plot_crosstab()`, `rr_plot_cluster_status()` and
+  `rr_plot_marker_support()` implement these conventions.
+
+## 9. Report and hand over
 
 Keep one representation table, one crosstab, one composition comparison and the
 figures that carry the decision. In the narrative state the question, matched
