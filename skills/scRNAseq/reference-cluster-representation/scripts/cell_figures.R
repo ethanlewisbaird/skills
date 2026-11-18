@@ -3,6 +3,32 @@
 # references/cell_figures.md.
 
 
+
+rr_top_reference_markers <- function(markers, top_n = 20L, p_adj = 0.05,
+                                     min_pct = 0.25, min_diff = 0.05) {
+  rr_require_columns(markers,
+    c("cluster", "gene", "p_val_adj", "pct.1", "pct.2", "avg_log2FC"), "markers")
+  keep <- markers$p_val_adj < p_adj & markers$pct.1 >= min_pct &
+    (markers$pct.1 - markers$pct.2) >= min_diff
+  d <- markers[keep, , drop = FALSE]
+  used <- character()
+  panel <- list()
+  for (k in sort(unique(markers$cluster))) {
+    x <- d[d$cluster == k, , drop = FALSE]
+    if (!nrow(x)) next
+    x <- x[order(-x$avg_log2FC), , drop = FALSE]
+    x <- x[!duplicated(x$gene), , drop = FALSE]
+    x <- x[!x$gene %in% used, , drop = FALSE]
+    take <- head(x, top_n)
+    if (!nrow(take)) next
+    used <- c(used, take$gene)
+    panel[[length(panel) + 1L]] <- take[, c("cluster", "gene"), drop = FALSE]
+  }
+  panel <- do.call(rbind, panel)
+  panel$label <- as.character(panel$cluster)
+  panel[, c("label", "gene"), drop = FALSE]
+}
+
 rr_reference_group_percent <- function(reference_counts, label = "label",
                                        flp = "flp", gal = "gal") {
   rr_require_columns(reference_counts, c(label, flp, gal), "reference_counts")

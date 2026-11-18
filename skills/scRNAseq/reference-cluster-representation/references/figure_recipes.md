@@ -53,9 +53,10 @@ p_age <- rr_plot_age_difference(comp$enrichment,
 
 ## Cell heatmaps
 
-See [cell_figures.md](cell_figures.md). Use up to 10 validated markers per
-reference cluster as rows grouped by reference cluster, and individual cells as
-columns split by query cluster. The two accepted figures are the marker heatmap
+See [cell_figures.md](cell_figures.md). Use up to 20 markers per reference cluster
+as rows grouped by reference cluster, and individual cells as columns split by
+query cluster. State whether the panel is Flp-validated or whole-reference
+descriptive. The two accepted figures are the marker heatmap
 and the binary detection heatmap.
 
 ## Reporting

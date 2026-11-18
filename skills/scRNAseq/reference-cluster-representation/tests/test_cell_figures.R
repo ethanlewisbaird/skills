@@ -20,6 +20,15 @@ predictions <- data.frame(cell = cells,
 markers <- data.frame(label = c("A", "A", "B", "B"),
   gene = c("M1", "M2", "M3", "M4"), stringsAsFactors = FALSE)
 
+marker_table <- data.frame(cluster = c(0, 0, 0, 1, 1),
+  gene = c("A", "B", "C", "D", "D"),
+  p_val_adj = 0.001, pct.1 = c(0.5, 0.4, 0.3, 0.6, 0.6),
+  pct.2 = c(0.1, 0.1, 0.1, 0.1, 0.1),
+  avg_log2FC = c(3, 2, 1, 2, 2), stringsAsFactors = FALSE)
+marker_panel <- rr_top_reference_markers(marker_table, top_n = 2, min_diff = 0.05)
+stopifnot(nrow(marker_panel) == 3, all(c("A", "B", "D") %in% marker_panel$gene),
+  all(c("label", "gene") %in% names(marker_panel)))
+
 groups <- data.frame(label = c("0", "1"), flp = c(80, 20), gal = c(20, 80))
 group_pct <- rr_reference_group_percent(groups)
 stopifnot(abs(group_pct$flp_percent[1] - 80) < 1e-8,

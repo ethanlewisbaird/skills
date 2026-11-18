@@ -191,7 +191,7 @@ Two cell-level heatmaps are accepted:
 1. cell marker heatmap (log-normalised expression, z-scored per gene);
 2. cell detection heatmap (binary detection).
 
-Use up to 10 markers per reference cluster as rows, grouped by reference cluster.
+Use up to 20 markers per reference cluster as rows, grouped by reference cluster.
 Use either the validated Flp-consistent panel (the verdict gate) or the
 whole-reference top-marker panel (descriptive, not Flp-validated); say which. Use
 individual cells as columns, split by **query cluster**. Add top annotations for
@@ -201,6 +201,7 @@ reference clusters as row groups and query clusters as column groups rather than
 repeating reference clusters on both axes.
 
 Source `scripts/reference_representation.R` then `scripts/cell_figures.R`.
+`rr_top_reference_markers()` selects the descriptive whole-reference panel;
 `rr_select_cells()` samples cells stratified by query cluster and sample;
 `rr_marker_display_matrices()` returns the z-scored and binary matrices;
 `rr_reference_group_percent()` returns the flp/gal row titles. Complete
