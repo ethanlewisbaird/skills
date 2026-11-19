@@ -161,9 +161,11 @@ Report threshold sensitivity. A single threshold is not a biological boundary.
 
 Completion: counts per verdict and a sensitivity table.
 
-## Accepted figure set
+## Standard output: eleven figures
 
-The accepted reference-representation figures are:
+All eleven figures are standard output of every reference-representation analysis.
+Produce every one of them, by default, without waiting to be asked and without
+treating any as a follow-up option. If a figure cannot be drawn, say which and why.
 
 1. reference-label composition heatmap;
 2. query-cluster crosstab heatmap;
@@ -177,7 +179,9 @@ The accepted reference-representation figures are:
 10. cell marker heatmap;
 11. cell detection heatmap.
 
-Functions and recipes are in [references/figure_recipes.md](references/figure_recipes.md).
+Figures 1-9 are produced by the plotting helpers and figures 10-11 by the cell
+recipes; a run that stops after figure 9 is incomplete. Functions and recipes are
+in [references/figure_recipes.md](references/figure_recipes.md).
 The plotting helpers are `rr_plot_composition()`, `rr_plot_crosstab()`,
 `rr_plot_projection()`, `rr_plot_query_vs_matched()`, `rr_plot_difference()`,
 `rr_plot_marker_support()`, `rr_plot_cluster_status()`, `rr_plot_alluvial()` and
@@ -186,7 +190,7 @@ The plotting helpers are `rr_plot_composition()`, `rr_plot_crosstab()`,
 
 ## Cell-level figures
 
-Two cell-level heatmaps are accepted:
+Both cell-level heatmaps are required standard output, not an optional extra:
 
 1. cell marker heatmap (log-normalised expression, z-scored per gene);
 2. cell detection heatmap (binary detection).
@@ -195,7 +199,7 @@ Use up to 10 markers per reference cluster as rows, grouped by reference cluster
 Use either the validated Flp-consistent panel (the verdict gate) or the
 whole-reference top-marker panel (descriptive, not Flp-validated); say which. Use
 individual cells as columns, split by **query cluster**. Add top annotations for
-reference label, sample and top-score bin. Row titles can carry each reference
+reference label, sample and top-score bin. Row titles carry each reference
 cluster's flp/gal percentage from `rr_reference_group_percent()`. This keeps
 reference clusters as row groups and query clusters as column groups rather than
 repeating reference clusters on both axes.
@@ -231,8 +235,8 @@ features.
 
 ## 9. Report and hand over
 
-Keep one representation table, one crosstab, one composition comparison and the
-figures that carry the decision. In the narrative state the question, matched
+Keep one representation table, one crosstab, one composition comparison and all
+eleven standard figures. In the narrative state the question, matched
 comparator, evidence, verdicts and limitations.
 
 State these limitations where they apply: transferred labels are not identity;

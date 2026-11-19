@@ -38,6 +38,9 @@ selected <- rr_select_cells(predictions, group_cols = c("query_cluster", "sample
   n_per_group = 2, seed = 1)
 stopifnot(nrow(selected) == 6,
   all(c("cell", "query_cluster", "sample") %in% names(selected)))
+# The default must stratify by query cluster and sample, not by predicted label.
+selected_default <- rr_select_cells(predictions, n_per_group = 2, seed = 1)
+stopifnot(identical(selected_default, selected))
 
 display <- rr_marker_display_matrices(counts, cells, markers,
   library_sizes = Matrix::colSums(counts))

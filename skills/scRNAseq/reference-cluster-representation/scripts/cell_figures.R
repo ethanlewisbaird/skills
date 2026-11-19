@@ -42,7 +42,7 @@ rr_reference_group_percent <- function(reference_counts, label = "label",
     stringsAsFactors = FALSE)
 }
 
-rr_select_cells <- function(predictions, group_cols = c("predicted_label", "sample"),
+rr_select_cells <- function(predictions, group_cols = c("query_cluster", "sample"),
                             n_per_group = 20L, seed = 1448145L) {
   rr_require_columns(predictions, c("cell", group_cols), "predictions")
   set.seed(seed)

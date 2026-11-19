@@ -19,7 +19,8 @@ groups; query clusters define the column groups.
 
 Source `scripts/reference_representation.R` first, then `scripts/cell_figures.R`.
 
-- `rr_select_cells()` samples cells stratified by query cluster and sample. Use a
+- `rr_select_cells()` samples cells stratified by query cluster and sample, so
+  `predictions` must carry a `query_cluster` column (or pass `group_cols`). Use a
   recorded seed.
 - `rr_marker_display_matrices()` returns the z-scored and binary matrices from
   original log-normalised RNA counts.
