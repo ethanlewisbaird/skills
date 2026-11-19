@@ -18,6 +18,7 @@ Reusable agent skills for scientifically rigorous, productive bioinformatics wor
 | [orthologue-coverage](skills/orthologue-coverage/SKILL.md) | Cross-species signature feasibility: stable-ID resolution, reciprocal score-best versus broader mapping, paralogue ambiguity and assayed/expressed coverage. Includes a metadata-only audit helper. |
 | [samap-alignment](skills/samap-alignment/SKILL.md) | SAMap cross-species scRNA-seq: input and identifier contracts, homology-graph build or reuse, per-species SAM fits, joint scoring, reference-composition sensitivities and claim checks. |
 | [scientific-report-writing](skills/scientific-report-writing/SKILL.md) | Reader-facing scientific narratives organized around research questions and selected evidence, with technical provenance maintained separately. |
+| [bioinformatics-skill-authoring](skills/bioinformatics-skill-authoring/SKILL.md) | Turn a completed analysis into a validated skill: scope and genre, evidence/decision boundary, SKILL.md grammar, synthetic validation, README indexing and installation. Includes a read-only structural checker. |
 
 The scRNA-seq collection is under `skills/scRNAseq/`. Install the complete
 `seurat-qc-clustering` subfolder using the discovery paths below. This skill requires R/Seurat,
@@ -187,6 +188,18 @@ for its missing figure annotation; this skill extension did not edit reports.
 Run `python skills/scientific-report-writing/scripts/test_check_report.py` to
 repeat the portable tests. The checker neither decodes raster images nor verifies
 scientific claims or browser layout; those remain separate checks.
+
+`bioinformatics-skill-authoring` passed fourteen synthetic checker tests on
+2026-11-19: frontmatter and name/directory rules, description heuristics, dead
+bundled pointers and local links, orphan references, placeholders, completion and
+validation headings, OpenAI metadata, long bodies, nested discovery, and
+read-only CLI status. Self-application reported 1,592 words and zero errors or
+warnings; the repository scan covered all thirteen skills with zero errors and 21
+advisory warnings, mostly missing license fields and absent `## Validation`
+headings in older skills. The checker is structural only and does not judge
+scope, scientific quality or activation. Run
+`python skills/bioinformatics-skill-authoring/tests/test_check_skill.py` to
+repeat the portable tests.
 
 On an HPC, run resource-consuming checks through your scheduler. The skill can also be checked with Codex's official `skill-creator/scripts/quick_validate.py` when available.
 

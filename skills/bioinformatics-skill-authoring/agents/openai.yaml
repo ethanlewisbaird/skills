@@ -1,0 +1,4 @@
+interface:
+  display_name: "Bioinformatics skill authoring"
+  short_description: "Turn completed analyses into validated agent skills"
+  default_prompt: "Use $bioinformatics-skill-authoring to turn this completed analysis into a validated skill."
