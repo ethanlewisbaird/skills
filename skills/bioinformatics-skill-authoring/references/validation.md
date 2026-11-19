@@ -68,3 +68,4 @@ This validates the checker and the skill's mechanical structure, not the quality
 of a skill it inspects or any biological conclusion.
 
 Source baseline: commit `59f5b34` on `main`, before this skill was added.
+Skill commit: `906e02e` (`Add bioinformatics skill authoring workflow and checker`).
